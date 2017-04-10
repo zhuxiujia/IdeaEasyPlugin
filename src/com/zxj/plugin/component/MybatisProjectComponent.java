@@ -1,5 +1,6 @@
 package com.zxj.plugin.component;
 
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.ide.SaveAndSyncHandler;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -12,9 +13,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public class MybatisProjectComponent implements ProjectComponent {
     Project project;
+
     public MybatisProjectComponent(Project project) {
-        System.out.println("print project path:"+project.getBaseDir().toString());
-        this.project=project;
+        System.out.println("print project path:" + project.getBaseDir().toString());
+        this.project = project;
     }
 
     @Override

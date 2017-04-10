@@ -10,8 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class MybatisModuleComponent implements ModuleComponent {
     public MybatisModuleComponent(Module module) {
 
-        System.out.println("print moule:"+module.getModuleFile().getParent().getPath());
-
+        System.out.println("print moule:" + module.getModuleFile().getParent().getPath());
     }
 
     @Override

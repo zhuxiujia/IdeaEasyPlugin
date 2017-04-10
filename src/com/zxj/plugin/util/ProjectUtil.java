@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
  */
 
 public class ProjectUtil {
-    public static void invate(){
+    public static void invate() {
         FileDocumentManager.getInstance().saveAllDocuments();
         SaveAndSyncHandler.getInstance().refreshOpenFiles();
         VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
