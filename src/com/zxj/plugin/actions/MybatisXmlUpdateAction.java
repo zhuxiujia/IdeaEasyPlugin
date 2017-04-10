@@ -198,7 +198,7 @@ public class MybatisXmlUpdateAction extends AnAction {
 		
 		// trim 2
 		Element trim2 = new BaseElement("trim");
-		trim2.addAttribute("prefix", "(");
+		trim2.addAttribute("prefix", "values (");
 		trim2.addAttribute("suffix", ")");
 		trim2.addAttribute("suffixOverrides", ",");
 		for (Element element : attributes) {
@@ -207,7 +207,7 @@ public class MybatisXmlUpdateAction extends AnAction {
 			String jdbcType = element.attributeValue("jdbcType");
 			String property = element.attributeValue("property");
 			_if.addAttribute("test", property + " != null");
-			_if.setText("   #{" + property + ",jdbcType=" + jdbcType + "},");
+			_if.setText("#{" + property + ",jdbcType=" + jdbcType + "},");
 			trim2.add(_if);
 		}
 		String trims2 = trim2.asXML().toString();
