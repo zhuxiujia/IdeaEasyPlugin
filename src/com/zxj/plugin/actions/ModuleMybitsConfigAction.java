@@ -2,8 +2,10 @@ package com.zxj.plugin.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.zxj.plugin.util.FileUtil;
+import com.zxj.plugin.util.ProjectUtil;
 import com.zxj.plugin.util.PropertyUtil;
 
 import javax.swing.*;
@@ -31,12 +33,26 @@ public class ModuleMybitsConfigAction extends AnAction {
         String fileName=baseDir+"/mybitsUpdateConfig.properties";
         System.out.println(fileName);
         try {
-            new File(fileName).delete();
+           File oldF= new File(fileName);
+           if(oldF.exists()){
+             int return_code=  Messages.showOkCancelDialog("file exits!in path:"+oldF.getPath()+". override this file?","zxj plugin",Messages.getErrorIcon());
+             System.out.println(return_code);
+             if(return_code==0){
+                 store(pro,fileName);
+             }
+           }else{
+               //store
+               store(pro,fileName);
+           }
         }catch (Exception e2){
             e2.printStackTrace();
         }
+    }
+
+    private void store(Properties pro, String fileName) {
         try {
             PropertyUtil.store(pro,fileName);
+            ProjectUtil.invate();
         } catch (Exception e1) {
             e1.printStackTrace();
         }

@@ -10,6 +10,7 @@ import javax.swing.*;
  * Created by zhuxiujie
  */
 public class MybatisComponent implements ApplicationComponent {
+
     @Override
     public void initComponent() {
 

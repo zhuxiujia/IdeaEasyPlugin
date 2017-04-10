@@ -3,8 +3,9 @@ package com.zxj.plugin.actions;
 import java.util.List;
 import java.util.Properties;
 
+import com.zxj.plugin.component.MybatisProjectComponent;
 import com.zxj.plugin.config.MybatisXmlConfig;
-import com.zxj.plugin.util.PropertyUtil;
+import com.zxj.plugin.util.*;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -13,14 +14,11 @@ import org.dom4j.tree.BaseElement;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.zxj.plugin.util.FileUtil;
-import com.zxj.plugin.util.JDBC2JAVA;
-import com.zxj.plugin.util.ReaderXML;
 
 /**
  * Created by zhuxiujie
  */
-public class MybatisXmlUpdateAction extends AnAction {
+public class MybatisResetCURDAction extends AnAction {
 	
 	MybatisXmlConfig mybatisXmlConfig;
 	
@@ -41,7 +39,7 @@ public class MybatisXmlUpdateAction extends AnAction {
                             try {
                                 runConfigure(document,event);
                                 ReaderXML.writer(document,event.getProject().getBasePath()+"/mapper_"+mybatisXmlConfig.getTableName()+".xml");
-
+								ProjectUtil.invate();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

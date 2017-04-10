@@ -32,7 +32,7 @@
 
     <group id="SimpleGroup" text="mybits_plugin" popup="true">
       <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
-      <action class="com.zxj.plugin.actions.MybatisXmlUpdateAction" id="org.jetbrains.tutorials.actions.GroupedAction"
+      <action class="com.zxj.plugin.actions.MybatisResetCURDAction" id="org.jetbrains.tutorials.actions.GroupedAction"
               text="xml reset CURD" description="Grouped Action Demo">
       </action>
       <action id="module_mybits_config" class="com.zxj.plugin.actions.ModuleMybitsConfigAction" text="makePlugin_configFile">

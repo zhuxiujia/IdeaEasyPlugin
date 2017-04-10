@@ -1,15 +1,20 @@
 package com.zxj.plugin.component;
 
+import com.intellij.ide.SaveAndSyncHandler;
 import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by zhuxiujie
  */
 public class MybatisProjectComponent implements ProjectComponent {
+    Project project;
     public MybatisProjectComponent(Project project) {
         System.out.println("print project path:"+project.getBaseDir().toString());
+        this.project=project;
     }
 
     @Override
@@ -37,4 +42,5 @@ public class MybatisProjectComponent implements ProjectComponent {
     public void projectClosed() {
         // called when project is being closed
     }
+
 }
