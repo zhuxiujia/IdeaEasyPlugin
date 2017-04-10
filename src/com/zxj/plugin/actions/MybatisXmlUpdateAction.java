@@ -124,7 +124,7 @@ public class MybatisXmlUpdateAction extends AnAction {
 		Element select = new BaseElement("update");
 		select.addAttribute("id", "deleteById");
 		select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-		select.addAttribute("resultMap", "BaseResultMap");
+		//select.addAttribute("resultMap", "BaseResultMap");
 		String logicDeleteCode = null;
 		if (mybatisXmlConfig.getLogicDeleteFlag() != null) {
 			logicDeleteCode = "\n\t\tset " + mybatisXmlConfig.getLogicDeleteFlag() + " = " + mybatisXmlConfig.getDeleteFlag();
@@ -140,7 +140,7 @@ public class MybatisXmlUpdateAction extends AnAction {
 		Element update = new BaseElement("update");
 		update.addAttribute("id", "updateById");
 		update.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-		update.addAttribute("resultMap", "BaseResultMap");
+		//update.addAttribute("resultMap", "BaseResultMap");
 		
 		Element set = new BaseElement("set");
 		for (Element element : attributes) {
