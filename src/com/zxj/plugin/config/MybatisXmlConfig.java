@@ -4,18 +4,9 @@ package com.zxj.plugin.config;
  * Created by zhuxiujie
  */
 public class MybatisXmlConfig {
-    String tableName = "table";
     String logicDeleteFlag = "delete_flag";
     String unDeleteFlag = "1";
     String deleteFlag = "0";
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
 
     public String getLogicDeleteFlag() {
         return logicDeleteFlag;

@@ -55,11 +55,11 @@ public class ModuleMybitsConfigAction extends AnAction {
                 System.out.println(return_code);
                 if (return_code == 0) {
                     store(pro, fileName);
-                    return;
                 }
+            }else {
+                //store
+                store(pro, fileName);
             }
-            //store
-            store(pro, fileName);
         } catch (Exception e2) {
             e2.printStackTrace();
         }
