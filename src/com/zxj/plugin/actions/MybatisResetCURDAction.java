@@ -88,14 +88,27 @@ public class MybatisResetCURDAction extends AnAction {
         }
     }
 
-    private void createBack(VirtualFile eventFile,AnActionEvent event) throws IOException {
-        Module module= ModuleUtilCore.findModuleForFile(eventFile, event.getProject());
-        VirtualFile bak= module.getModuleFile().getParent().findChild("bak");
-        if (bak==null||!bak.exists()){ bak = module.getModuleFile().getParent().createChildDirectory(new File("bak/"), "bak");}
-        VirtualFile bakFile= bak.findChild(eventFile.getName());
-        bakFile.delete(null);
-        eventFile.copy(eventFile,bak,eventFile.getName());
-        eventFile.delete(null);
+    private void createBack(VirtualFile eventFile,AnActionEvent event){
+        try {
+            Module module = ModuleUtilCore.findModuleForFile(eventFile, event.getProject());
+            VirtualFile bak = module.getModuleFile().getParent().findChild("bak");
+            try {
+                if (bak == null || !bak.exists()) {
+                    bak = module.getModuleFile().getParent().createChildDirectory(new File("bak/"), "bak");
+                }
+            }catch (Exception e){
+
+            }
+            VirtualFile bakFile = bak.findChild(eventFile.getName());
+            try {
+                bakFile.delete(null);
+            } catch (Exception e) {
+            }
+            eventFile.copy(eventFile, bak, eventFile.getName());
+            eventFile.delete(null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void runConfigure( Document document, AnActionEvent e) throws Exception {
