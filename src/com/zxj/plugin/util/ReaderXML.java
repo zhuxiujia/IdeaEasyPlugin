@@ -14,15 +14,13 @@ import org.dom4j.io.XMLWriter;
  * Created by zhuxiujie
  */
 public class ReaderXML {
+   private static  final   SAXReader reader = new SAXReader();
     public static void main(String[] args) {
 
     }
 
     public static void read(String filePath, XMLInterface xmlInterface) {
         try {
-
-            SAXReader reader = new SAXReader();
-
             // 3。获取文件
             System.out.println("load xml path:" + filePath);
             File file = new File(filePath);

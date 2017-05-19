@@ -22,7 +22,6 @@ import com.intellij.openapi.vfs.newvfs.impl.VirtualDirectoryImpl;
 import com.intellij.openapi.vfs.newvfs.impl.VirtualFileImpl;
 import com.zxj.plugin.component.MybatisProjectComponent;
 import com.zxj.plugin.config.CRUDDialogConfig;
-import com.zxj.plugin.config.MybatisXmlConfig;
 import com.zxj.plugin.util.*;
 import com.zxj.plugin.view.CRUDDialog;
 import org.dom4j.Attribute;
@@ -39,8 +38,6 @@ import com.intellij.openapi.vfs.VirtualFile;
  */
 public class MybatisResetCURDAction extends AnAction {
 
-    MybatisXmlConfig mybatisXmlConfig;
-    CRUDDialogConfig crudDialogConfig;
 
     @Override
     public void update(AnActionEvent event) {
@@ -54,40 +51,22 @@ public class MybatisResetCURDAction extends AnAction {
         String extension = eventFile.getExtension();
 
         if (extension != null && extension.equals("xml")) {
-            ReaderXML.read(eventFile.getPath(), new ReaderXML.XMLInterface() {
+            CRUDDialog crudDialog = new CRUDDialog(new CRUDDialog.Resulet() {
                 @Override
-                public void update(Document document) {
-
-                    CRUDDialog crudDialog = new CRUDDialog(new CRUDDialog.Resulet() {
-                        @Override
-                        public void result(CRUDDialogConfig crudDialogConfig) {
-                            if(crudDialogConfig.getTableName()==null||crudDialogConfig.getTableName().equals("")) {
-                                Messages.showMessageDialog(
-                                        "表名不可为空！",
-
-                                        "error",
-
-                                        Messages.getErrorIcon()
-
-                                );
-                            }else {
-                                MybatisResetCURDAction.this.crudDialogConfig = crudDialogConfig;
-                                try {
-                                    runConfigure(document, event);
-                                    createBack(eventFile, event);
-                                    ReaderXML.writer(document, eventFile.getParent().getPath() + "/" + eventFile.getName());
-                                    ProjectUtil.invate();
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                        }
-                    });
-                    crudDialog.pack();
-                    crudDialog.setVisible(true);
+                public void result(CRUDDialogConfig crudDialogConfig) {
+                    if (crudDialogConfig.getTableName() == null || crudDialogConfig.getTableName().equals("")) {
+                        Messages.showMessageDialog(
+                                "表名不可为空！",
+                                "error",
+                                Messages.getErrorIcon()
+                        );
+                    } else {
+                        readData(eventFile, event, crudDialogConfig);
+                    }
                 }
             });
-
+            crudDialog.pack();
+            crudDialog.setVisible(true);
         } else {
             Messages.showMessageDialog(
                     eventFile.getName() + " is not a .xml file!",
@@ -100,38 +79,27 @@ public class MybatisResetCURDAction extends AnAction {
         }
     }
 
-    private void createBack(VirtualFile eventFile,AnActionEvent event){
-        try {
-            Module module = ModuleUtilCore.findModuleForFile(eventFile, event.getProject());
-            VirtualFile bak = module.getModuleFile().getParent().findChild("bak");
-            try {
-                if (bak == null || !bak.exists()) {
-                    bak = module.getModuleFile().getParent().createChildDirectory(new File("bak/"), "bak");
+    private void readData(VirtualFile file, AnActionEvent event, CRUDDialogConfig crudDialogConfig) {
+        ReaderXML.read(file.getPath(), new ReaderXML.XMLInterface() {
+            @Override
+            public void update(Document document) {
+                try {
+                    runConfigure(document, event, crudDialogConfig);
+                    ReaderXML.writer(document, file.getParent().getPath() + "/" + file.getName());
+                    ProjectUtil.invate();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            }catch (Exception e){
-
             }
-            VirtualFile bakFile = bak.findChild(eventFile.getName());
-            try {
-                bakFile.delete(null);
-            } catch (Exception e) {
-            }
-            eventFile.copy(eventFile, bak, eventFile.getName());
-            eventFile.delete(null);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        });
     }
 
-    private void runConfigure( Document document, AnActionEvent e) throws Exception {
+
+    private void runConfigure(Document document, AnActionEvent e, CRUDDialogConfig crudDialogConfig) throws Exception {
         String baseDir = e.getProject().getBaseDir().getPath();
         String fileName = baseDir + "/mybitsUpdateConfig.properties";
         Properties properties = new Properties();
         PropertyUtil.read(properties, fileName);
-        mybatisXmlConfig = new MybatisXmlConfig();
-        mybatisXmlConfig.setDeleteFlag(properties.getProperty("deleteFlag"));
-        mybatisXmlConfig.setUnDeleteFlag(properties.getProperty("unDeleteFlag"));
-        mybatisXmlConfig.setLogicDeleteFlag(properties.getProperty("logicDeleteFlag"));
 
         Element rootElement = document.getRootElement();
         List<Element> elementList = rootElement.elements();
@@ -143,10 +111,10 @@ public class MybatisResetCURDAction extends AnAction {
             }
         }
         // add select
-        if (crudDialogConfig.isSelect()) addSelect(rootElement);
-        if (crudDialogConfig.isDelete()) addDelete(rootElement);
-        if (crudDialogConfig.isUpdate()) addUpdate(rootElement);
-        if (crudDialogConfig.isCreate()) addInsert(rootElement);
+        if (crudDialogConfig.isSelect()) addSelect(rootElement, crudDialogConfig);
+        if (crudDialogConfig.isDelete()) addDelete(rootElement, crudDialogConfig);
+        if (crudDialogConfig.isUpdate()) addUpdate(rootElement, crudDialogConfig);
+        if (crudDialogConfig.isCreate()) addInsert(rootElement, crudDialogConfig);
         rootElement.addText("\n");
         System.out.println(document.toString());
 
@@ -172,7 +140,7 @@ public class MybatisResetCURDAction extends AnAction {
         return false;
     }
 
-    private void addSelect(Element rootElement) {
+    private void addSelect(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
 
         Element select = new BaseElement("select");
@@ -180,14 +148,14 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
         select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = null;
-        if (mybatisXmlConfig.getLogicDeleteFlag() != null) {
-            logicDeleteCode = "     and " + mybatisXmlConfig.getLogicDeleteFlag() + " = " + mybatisXmlConfig.getUnDeleteFlag() + "\n ";
+        if (crudDialogConfig.isDeleteFlag()) {
+            logicDeleteCode = "     and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n ";
         }
         select.setText("\n     select * from " + crudDialogConfig.getTableName() + "\n\t\twhere id = #{id,jdbcType=INTEGER}\n" + logicDeleteCode);
         rootElement.add(select);
     }
 
-    private void addDelete(Element rootElement) {
+    private void addDelete(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
 
         Element select = new BaseElement("update");
@@ -195,14 +163,14 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
         //select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = null;
-        if (mybatisXmlConfig.getLogicDeleteFlag() != null) {
-            logicDeleteCode = "\n\t\tset " + mybatisXmlConfig.getLogicDeleteFlag() + " = " + mybatisXmlConfig.getDeleteFlag();
+        if (crudDialogConfig.isDeleteFlag()) {
+            logicDeleteCode = "\n\t\tset " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getDeletedStr();
         }
         select.setText("\n     update " + crudDialogConfig.getTableName() + logicDeleteCode + "\n\t\twhere id = #{id,jdbcType=INTEGER} \n ");
         rootElement.add(select);
     }
 
-    private void addUpdate(Element rootElement) {
+    private void addUpdate(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
         List<Element> attributes = rootElement.element("resultMap").elements("result");
 
@@ -227,15 +195,15 @@ public class MybatisResetCURDAction extends AnAction {
         sets = sets.replaceAll("</set>", "\n   </set>");
 
         String logicDeleteCode = null;
-        if (mybatisXmlConfig.getLogicDeleteFlag() != null) {
-            logicDeleteCode = " and " + mybatisXmlConfig.getLogicDeleteFlag() + " = " + mybatisXmlConfig.getUnDeleteFlag() + "\n ";
+        if (crudDialogConfig.isDeleteFlag()) {
+            logicDeleteCode = " and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n ";
         }
         update.setText(
                 " \n     update " + crudDialogConfig.getTableName() + " " + sets + "\t\twhere id = #{id,jdbcType=INTEGER}" + logicDeleteCode);
         rootElement.add(update);
     }
 
-    private void addInsert(Element rootElement) {
+    private void addInsert(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").attribute("type").getValue();
         List<Element> attributes = rootElement.element("resultMap").elements("result");
 

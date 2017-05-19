@@ -14,6 +14,10 @@ public class CRUDDialog extends JDialog {
     private JCheckBox update_mothedCheckBox;
     private JCheckBox create_return_idCheckBox;
     private JTextField textField1;
+    private JCheckBox deleteFlagCheckBox;
+    private JTextField delete_flagTextField;
+    private JTextField unDeleteTextField;
+    private JTextField deletedTextField;
 
 
     public interface Resulet{
@@ -60,7 +64,7 @@ public class CRUDDialog extends JDialog {
     private void onOK(ActionEvent event) {
         // add your code here
         dispose();
-        CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig(textField1.getText(),select_mothedCheckBox.isSelected(),delete_mothedCheckBox.isSelected(),update_mothedCheckBox.isSelected(),create_return_idCheckBox.isSelected());
+        CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig(textField1.getText(),select_mothedCheckBox.isSelected(),delete_mothedCheckBox.isSelected(),update_mothedCheckBox.isSelected(),create_return_idCheckBox.isSelected(),deleteFlagCheckBox.isSelected(),delete_flagTextField.getText(),deletedTextField.getText(),unDeleteTextField.getText());
         resulet.result(crudDialogConfig);
     }
 
