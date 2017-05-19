@@ -38,16 +38,6 @@
       <action id="module_mybits_config" class="com.zxj.plugin.actions.ModuleMybitsConfigAction" text="makePlugin_configFile">
       </action>
     </group>
-
-
-
-
-    <!-- Add your actions here -->
-    <action id="addMybitsFlag" class="com.zxj.plugin.actions.AddMybitsFlagAction" text="addMybitsFlag">
-      <add-to-group group-id="WindowMenu" anchor="first"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="F"/>
-    </action>
-
   </actions>
   <application-components>
     <!-- Add your application components here -->

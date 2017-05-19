@@ -52,6 +52,7 @@ public class MybatisResetCURDAction extends AnAction {
         // Does nothing
         VirtualFile eventFile = FileUtil.getFile(event.getDataContext());
         String extension = eventFile.getExtension();
+
         if (extension != null && extension.equals("xml")) {
             ReaderXML.read(eventFile.getPath(), new ReaderXML.XMLInterface() {
                 @Override
@@ -60,14 +61,25 @@ public class MybatisResetCURDAction extends AnAction {
                     CRUDDialog crudDialog = new CRUDDialog(new CRUDDialog.Resulet() {
                         @Override
                         public void result(CRUDDialogConfig crudDialogConfig) {
-                            MybatisResetCURDAction.this.crudDialogConfig=crudDialogConfig;
-                            try {
-                                runConfigure( document, event);
-                                createBack(eventFile,event);
-                                ReaderXML.writer(document, eventFile.getParent().getPath()+"/"+eventFile.getName());
-                                ProjectUtil.invate();
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
+                            if(crudDialogConfig.getTableName()==null||crudDialogConfig.getTableName().equals("")) {
+                                Messages.showMessageDialog(
+                                        "表名不可为空！",
+
+                                        "error",
+
+                                        Messages.getErrorIcon()
+
+                                );
+                            }else {
+                                MybatisResetCURDAction.this.crudDialogConfig = crudDialogConfig;
+                                try {
+                                    runConfigure(document, event);
+                                    createBack(eventFile, event);
+                                    ReaderXML.writer(document, eventFile.getParent().getPath() + "/" + eventFile.getName());
+                                    ProjectUtil.invate();
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
                             }
                         }
                     });
