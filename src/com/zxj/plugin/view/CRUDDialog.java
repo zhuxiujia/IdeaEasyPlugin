@@ -18,6 +18,11 @@ public class CRUDDialog extends JDialog {
     private JTextField delete_flagTextField;
     private JTextField unDeleteTextField;
     private JTextField deletedTextField;
+    private JCheckBox selectByConditionCheckBox;
+    private JCheckBox countByConditionCheckBox;
+    private JTextField textField2;
+    private JTextField textField3;
+    private JTextField textField4;
 
 
     public interface Resulet{
@@ -65,6 +70,8 @@ public class CRUDDialog extends JDialog {
         // add your code here
         dispose();
         CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig(textField1.getText(),select_mothedCheckBox.isSelected(),delete_mothedCheckBox.isSelected(),update_mothedCheckBox.isSelected(),create_return_idCheckBox.isSelected(),deleteFlagCheckBox.isSelected(),delete_flagTextField.getText(),deletedTextField.getText(),unDeleteTextField.getText());
+        crudDialogConfig.setCountByCondition(countByConditionCheckBox.isSelected());
+        crudDialogConfig.setSelectByCondition(selectByConditionCheckBox.isSelected());
         resulet.result(crudDialogConfig);
     }
 
@@ -78,6 +85,7 @@ public class CRUDDialog extends JDialog {
             @Override
             public void result(CRUDDialogConfig crudDialogConfig) {
 
+                System.out.println();
             }
         });
         dialog.pack();

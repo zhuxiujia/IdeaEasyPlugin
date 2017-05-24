@@ -24,6 +24,7 @@ import com.zxj.plugin.component.MybatisProjectComponent;
 import com.zxj.plugin.config.CRUDDialogConfig;
 import com.zxj.plugin.util.*;
 import com.zxj.plugin.view.CRUDDialog;
+import org.apache.commons.lang.text.StrBuilder;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -37,7 +38,9 @@ import com.intellij.openapi.vfs.VirtualFile;
  * Created by zhuxiujie
  */
 public class MybatisResetCURDAction extends AnAction {
-
+   private static   String contentBlank="        ";
+   private static String contentBlank2="            ";
+    private static  String outSideBlank="    ";
 
     @Override
     public void update(AnActionEvent event) {
@@ -79,12 +82,14 @@ public class MybatisResetCURDAction extends AnAction {
         }
     }
 
+
+
     private void readData(VirtualFile file, AnActionEvent event, CRUDDialogConfig crudDialogConfig) {
         ReaderXML.read(file.getPath(), new ReaderXML.XMLInterface() {
             @Override
             public void update(Document document) {
                 try {
-                    runConfigure(document, event, crudDialogConfig);
+                    runConfigure(document, crudDialogConfig);
                     ReaderXML.writer(document, file.getParent().getPath() + "/" + file.getName());
                     ProjectUtil.invate();
                 } catch (Exception ex) {
@@ -95,11 +100,7 @@ public class MybatisResetCURDAction extends AnAction {
     }
 
 
-    private void runConfigure(Document document, AnActionEvent e, CRUDDialogConfig crudDialogConfig) throws Exception {
-        String baseDir = e.getProject().getBaseDir().getPath();
-        String fileName = baseDir + "/mybitsUpdateConfig.properties";
-        Properties properties = new Properties();
-        PropertyUtil.read(properties, fileName);
+    private static void runConfigure(Document document,  CRUDDialogConfig crudDialogConfig) throws Exception {
 
         Element rootElement = document.getRootElement();
         List<Element> elementList = rootElement.elements();
@@ -115,13 +116,14 @@ public class MybatisResetCURDAction extends AnAction {
         if (crudDialogConfig.isDelete()) addDelete(rootElement, crudDialogConfig);
         if (crudDialogConfig.isUpdate()) addUpdate(rootElement, crudDialogConfig);
         if (crudDialogConfig.isCreate()) addInsert(rootElement, crudDialogConfig);
-        rootElement.addText("\n");
-        System.out.println(document.toString());
 
-        System.out.println("success ,");
+        if (crudDialogConfig.isSelectByCondition())addSelectByColumn(document.getRootElement(),crudDialogConfig);
+        if (crudDialogConfig.isCountByCondition())addCountByColumn(document.getRootElement(),crudDialogConfig);
+        System.out.println(document.toString());
+        System.out.println("success");
     }
 
-    private boolean checkNeedRemove(Element element) {
+    private static   boolean checkNeedRemove(Element element) {
         //if(!attributeStr.equals("BaseResultMap"))return true;
         Attribute attribute = element.attribute("id");
         String attributeStr = attribute.getValue();
@@ -140,37 +142,40 @@ public class MybatisResetCURDAction extends AnAction {
         return false;
     }
 
-    private void addSelect(Element rootElement, CRUDDialogConfig crudDialogConfig) {
+    private static void addSelect(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
-
         Element select = new BaseElement("select");
         select.addAttribute("id", "selectById");
         select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
         select.addAttribute("resultMap", "BaseResultMap");
-        String logicDeleteCode = null;
+        String logicDeleteCode = "";
         if (crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = "     and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n ";
+            logicDeleteCode = contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
         }
-        select.setText("\n     select * from " + crudDialogConfig.getTableName() + "\n\t\twhere id = #{id,jdbcType=INTEGER}\n" + logicDeleteCode);
+        select.setText("\n"+contentBlank+"select * from " + crudDialogConfig.getTableName() + "\n"+contentBlank+"where id = #{id,jdbcType=INTEGER}\n" + logicDeleteCode+outSideBlank);
         rootElement.add(select);
     }
 
-    private void addDelete(Element rootElement, CRUDDialogConfig crudDialogConfig) {
+    private static void addDelete(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
-
-        Element select = new BaseElement("update");
-        select.addAttribute("id", "deleteById");
-        select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-        //select.addAttribute("resultMap", "BaseResultMap");
-        String logicDeleteCode = null;
-        if (crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = "\n\t\tset " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getDeletedStr();
+        Element select =null;
+        if (!crudDialogConfig.isDeleteFlag()) {
+             select = new BaseElement("update");
+            select.addAttribute("id", "deleteById");
+            select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
+            //select.addAttribute("resultMap", "BaseResultMap");
+            String logicDeleteCode = "\n" + contentBlank + "set " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getDeletedStr() + "\n";
+            select.setText("\n" + contentBlank + "update " + crudDialogConfig.getTableName() + logicDeleteCode + contentBlank + "where id = #{id,jdbcType=INTEGER}\n" + outSideBlank);
+        }else {
+             select = new BaseElement("delete");
+            select.addAttribute("id", "deleteById");
+            select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
+            select.setText("\n" + contentBlank + "delete from " + crudDialogConfig.getTableName()   + " where id = #{id,jdbcType=INTEGER}\n" + outSideBlank);
         }
-        select.setText("\n     update " + crudDialogConfig.getTableName() + logicDeleteCode + "\n\t\twhere id = #{id,jdbcType=INTEGER} \n ");
         rootElement.add(select);
     }
 
-    private void addUpdate(Element rootElement, CRUDDialogConfig crudDialogConfig) {
+    private static void addUpdate(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
         List<Element> attributes = rootElement.element("resultMap").elements("result");
 
@@ -178,8 +183,7 @@ public class MybatisResetCURDAction extends AnAction {
         update.addAttribute("id", "updateById");
         update.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
         //update.addAttribute("resultMap", "BaseResultMap");
-
-        Element set = new BaseElement("set");
+        StrBuilder strBuilder=new StrBuilder().append("\n").append(contentBlank).append("<set>");
         for (Element element : attributes) {
             Element _if = new BaseElement("if");
             String column = element.attributeValue("column");
@@ -187,23 +191,19 @@ public class MybatisResetCURDAction extends AnAction {
             String property = element.attributeValue("property");
             _if.addAttribute("test", property + " != null");
             _if.setText(column + " = #{" + property + ",jdbcType=" + jdbcType + "},");
-            set.add(_if);
+            strBuilder.append("\n").append(contentBlank2).append(_if.asXML().toString());
         }
-        String sets = set.asXML().toString();
-        sets = sets.replaceAll("<if", "\n        <if");
-        sets = sets.replaceAll("<set>", "\n   <set>");
-        sets = sets.replaceAll("</set>", "\n   </set>");
+        strBuilder.append("\n").append(contentBlank).append("</set>").append("\n");
 
-        String logicDeleteCode = null;
+        String logicDeleteCode = "";
         if (crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = " and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n ";
+            logicDeleteCode = " and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() ;
         }
-        update.setText(
-                " \n     update " + crudDialogConfig.getTableName() + " " + sets + "\t\twhere id = #{id,jdbcType=INTEGER}" + logicDeleteCode);
+        update.setText("\n"+contentBlank+"update " + crudDialogConfig.getTableName() + " " + strBuilder.toString() + "\t\twhere id = #{id,jdbcType=INTEGER}"+ logicDeleteCode+ "\n "+outSideBlank);
         rootElement.add(update);
     }
 
-    private void addInsert(Element rootElement, CRUDDialogConfig crudDialogConfig) {
+    private  static void addInsert(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").attribute("type").getValue();
         List<Element> attributes = rootElement.element("resultMap").elements("result");
 
@@ -229,9 +229,9 @@ public class MybatisResetCURDAction extends AnAction {
             trim1.add(_if);
         }
         String trims1 = trim1.asXML().toString();
-        trims1 = trims1.replaceAll("<if", "\n        <if");
-        trims1 = trims1.replaceAll("<trim>", "\n   <trim>\n");
-        trims1 = trims1.replaceAll("</trim>", "\n   </trim>\n");
+        trims1 = trims1.replaceAll("<if", "\n"+contentBlank2+"<if");
+        trims1 = trims1.replaceAll("<trim", "\n"+contentBlank+"<trim");
+        trims1 = trims1.replaceAll("</trim>", "\n"+contentBlank+"</trim>");
 
         // trim 2
         Element trim2 = new BaseElement("trim");
@@ -248,12 +248,97 @@ public class MybatisResetCURDAction extends AnAction {
             trim2.add(_if);
         }
         String trims2 = trim2.asXML().toString();
-        trims2 = trims2.replaceAll("<if", "\n        <if");
-        trims2 = trims2.replaceAll("<trim>", "\n   <trim>\n");
-        trims2 = trims2.replaceAll("</trim>", "\n   </trim>\n");
+        trims2 = trims2.replaceAll("<if", "\n"+contentBlank2+"<if");
+        trims2 = trims2.replaceAll("<trim", "\n"+contentBlank+"<trim");
+        trims2 = trims2.replaceAll("</trim>", "\n"+contentBlank+"</trim>");
 
-        insert.setText("\n     insert into " + crudDialogConfig.getTableName() + "\n " + trims1 + "\n" + trims2);
+        insert.setText("\n"+contentBlank+"insert into " + crudDialogConfig.getTableName()  + trims1 + "\n" + trims2+"\n"+outSideBlank);
         rootElement.add(insert);
 
     }
+
+    private static   void addSelectByColumn(Element rootElement, CRUDDialogConfig crudDialogConfig){
+        List<Element> attributes = rootElement.element("resultMap").elements("result");
+        String idCloumn=rootElement.element("resultMap").element("id").getName();
+        Element select = new BaseElement("select");
+        select.addAttribute("id", "selectByCondition");
+        //select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
+        select.addAttribute("resultMap", "BaseResultMap");
+        String logicDeleteCode = "";//逻辑删除
+        if (crudDialogConfig.isDeleteFlag()) {
+            logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+        }else {
+            logicDeleteCode=idCloumn+" > -1"+ "\n";
+        }
+        StringBuilder stringBuilder=new StringBuilder();
+        stringBuilder.append("\n").append(contentBlank).append("select * from ").append(crudDialogConfig.getTableName()) .append(" where ") .append(logicDeleteCode);
+        addAllAttributes(attributes,stringBuilder,crudDialogConfig.getDeleteFlagStr());
+        select.setText(stringBuilder.toString()+outSideBlank);
+        rootElement.add(select);
+    }
+    private static   void addCountByColumn(Element rootElement, CRUDDialogConfig crudDialogConfig){
+
+        List<Element> attributes = rootElement.element("resultMap").elements("result");
+        String idCloumn=rootElement.element("resultMap").element("id").getName();
+        Element select = new BaseElement("select");
+        select.addAttribute("id", "countByCondition");
+        //select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
+        select.addAttribute("resultMap", "BaseResultMap");
+        String logicDeleteCode = null;//逻辑删除
+        if (crudDialogConfig.isDeleteFlag()) {
+            logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+        }else {
+            logicDeleteCode=idCloumn+" > -1"+ "\n";
+        }
+        StringBuilder stringBuilder=new StringBuilder();
+        stringBuilder.append("\n").append(contentBlank).append("select count(id) from ").append(crudDialogConfig.getTableName()) .append(" where ") .append(logicDeleteCode);
+        addAllAttributes(attributes,stringBuilder,crudDialogConfig.getDeleteFlagStr());
+        select.setText(stringBuilder.toString()+outSideBlank);
+        rootElement.add(select);
+        System.out.println(rootElement.toString());
+    }
+
+    private static void addAllAttributes(List<Element> attributes, StringBuilder stringBuilder,String deleteFlagStr) {
+        for (Element element : attributes) {
+            Element _if = new BaseElement("if");
+            String column = element.attributeValue("column");
+            String jdbcType = element.attributeValue("jdbcType");
+            String property = element.attributeValue("property");
+            _if.addAttribute("test", property + " != null");
+            _if.setText("and "+column + " = #{" + property + ",jdbcType=" + jdbcType + "},");
+            if(deleteFlagStr!=null&&deleteFlagStr.equals(column)){
+            }else {
+                stringBuilder.append(contentBlank).append(_if.asXML().toString()).append("\n");
+            }
+        }
+    }
+
+    private static boolean removeAllButCloumn(Document document) {
+        Element rootElement = document.getRootElement();
+        List<Element> elementList = rootElement.elements();
+        for (Element element : elementList) {// <result <select
+           if(!element.getName().equals("resultMap")) {
+               element.getParent().remove(element);
+           }
+        }
+        return true;
+    }
+
+    public static void main(String[] arsg){
+        ReaderXML.read("H:\\JAVA\\remote\\IdeaEasyPlugin\\test\\ProductMapper_new.xml", new ReaderXML.XMLInterface() {
+            @Override
+            public void update(Document document) {
+                try {
+                    //CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig("table",true,true,true,true,true,"delete_flag","0","1");
+                   // removeAllButCloumn(document);
+                    //runConfigure(document,crudDialogConfig);
+
+                   // ReaderXML.writer(document, "H:\\JAVA\\remote\\IdeaEasyPlugin\\test\\ProductMapper_new.xml");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+    }
+
 }

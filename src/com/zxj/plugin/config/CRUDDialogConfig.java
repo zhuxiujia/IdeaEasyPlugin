@@ -15,6 +15,9 @@ public class CRUDDialogConfig {
     boolean create;
     boolean deleteFlag;
 
+    boolean selectByCondition;
+    boolean countByCondition;
+
     String deleteFlagStr;
     String deletedStr;
     String unDeletedStr;
@@ -48,7 +51,7 @@ public class CRUDDialogConfig {
     }
 
     public String getTableName() {
-        return tableName;
+        return tableName==null?null:tableName.trim().replaceAll("\n","");
     }
 
     public boolean isDeleteFlag() {
@@ -66,5 +69,21 @@ public class CRUDDialogConfig {
 
     public String getUnDeletedStr() {
         return unDeletedStr;
+    }
+
+    public boolean isCountByCondition() {
+        return countByCondition;
+    }
+
+    public boolean isSelectByCondition() {
+        return selectByCondition;
+    }
+
+    public void setCountByCondition(boolean countByCondition) {
+        this.countByCondition = countByCondition;
+    }
+
+    public void setSelectByCondition(boolean selectByCondition) {
+        this.selectByCondition = selectByCondition;
     }
 }

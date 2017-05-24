@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lanqee.financial.repository.cms.ArticleCategoryRepository">
+    <resultMap id="BaseResultMap" type="com.lanqee.financial.model.cms.ArticleCategory">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="category_name" property="categoryName" jdbcType="VARCHAR"/>
+        <result column="weight" property="weight" jdbcType="INTEGER"/>
+        <result column="super_id" property="superId" jdbcType="BIGINT"/>
+        <result column="level" property="level" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="INTEGER"/>
+    </resultMap>
+    <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select * from cms_article_category
+		where id = #{id,jdbcType=BIGINT} and enabled = 1
+	</select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from cms_article_category where enabled = 1
+    </select>
+    <select id="selectByLevel" resultMap="BaseResultMap">
+        select * from cms_article_category
+        where `level` = #{level,jdbcType=INTEGER} and enabled = 1
+        ORDER BY weight DESC
+    </select>
+    <select id="selectBySuperId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select * from cms_article_category
+        where super_id = #{superId,jdbcType=BIGINT} and enabled = 1
+        ORDER BY weight DESC
+    </select>
+    <select id="countAll" resultType="java.lang.Integer">
+        SELECT count(1) FROM cms_article_category
+        WHERE enabled=1
+    </select>
+    <select id="selectWithLimit" resultMap="BaseResultMap">
+        SELECT * FROM cms_article_category
+        WHERE enabled=1
+        ORDER BY create_time DESC
+        limit ${offset},${size}
+    </select>
+    <insert id="insert" parameterType="com.lanqee.financial.model.cms.ArticleCategory" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="id">
+        insert into cms_article_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="categoryName != null">
+                category_name,
+            </if>
+            <if test="weight != null">
+                weight,
+            </if>
+            <if test="superId != null">
+                super_id,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="enabled != null">
+                enabled,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="categoryName != null">
+                #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null">
+                #{weight,jdbcType=INTEGER},
+            </if>
+            <if test="superId != null">
+                #{superId,jdbcType=BIGINT},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabled != null">
+                #{enabled,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateById" parameterType="com.lanqee.financial.model.cms.ArticleCategory">
+        update cms_article_category
+        <set>
+            <if test="categoryName != null">
+                category_name = #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null">
+                weight = #{weight,jdbcType=INTEGER},
+            </if>
+            <if test="superId != null">
+                super_id = #{weight,jdbcType=BIGINT},
+            </if>
+            <if test="level != null">
+                level = #{level,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT} AND enabled=1
+    </update>
+    <update id="deleteById">
+        update cms_article_category
+        set enabled = 0, update_time= #{updateTime,jdbcType=TIMESTAMP}
+        where id =#{id,jdbcType=BIGINT}
+        AND enabled = 1
+	</update>
+</mapper>
