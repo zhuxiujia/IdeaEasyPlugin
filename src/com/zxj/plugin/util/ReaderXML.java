@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.SAXWriter;
 import org.dom4j.io.XMLWriter;
 
 /**
@@ -28,6 +29,7 @@ public class ReaderXML {
             document.setXMLEncoding("UTF-8");
             xmlInterface.update(document);
         } catch (Exception e) {
+            xmlInterface.error(e.getMessage());
             e.printStackTrace();
             System.out.println("load file fail:" + filePath);
         }
@@ -42,7 +44,7 @@ public class ReaderXML {
     public static void writer(Document document, String fileName) {
         try {
             // 紧凑的格式
-            // OutputFormat format = OutputFormat.createCompactFormat();
+             //OutputFormat format = OutputFormat.createCompactFormat();
             // 排版缩进的格式
             OutputFormat format = OutputFormat.createPrettyPrint();
             // 设置编码
@@ -51,11 +53,10 @@ public class ReaderXML {
             format.setIndent(true); // 设置是否缩进
             format.setIndent("    "); // 以四个空格方式实现缩进
             format.setNewlines(true); // 设置是否换行
-
+            format.setOmitEncoding(true);
             // 创建XMLWriter对象,指定了写出文件及编码格式
             XMLWriter writer = new XMLWriter(
-                    new OutputStreamWriter(new FileOutputStream(new File(fileName)), "UTF-8"),
-                    format);
+                    new OutputStreamWriter(new FileOutputStream(new File(fileName)), "UTF-8"), format);
             writer.setEscapeText(false);
             // 写入
             writer.write(document);
@@ -71,5 +72,6 @@ public class ReaderXML {
 
     public interface XMLInterface {
         void update(Document document);
+        void error(String info);
     }
 }

@@ -24,6 +24,7 @@ public class MybatisResetCURDAction extends AnAction {
    private static String contentBlank2="            ";
     private static  String outSideBlank="    ";
 
+    CRUDDialog crudDialog =null;
     @Override
     public void update(AnActionEvent event) {
         event.getPresentation().setEnabledAndVisible(true);
@@ -37,7 +38,7 @@ public class MybatisResetCURDAction extends AnAction {
 
         if (extension != null && extension.equals("xml")) {
 
-            CRUDDialog crudDialog = new CRUDDialog(new CRUDDialog.Resulet() {
+             crudDialog = new CRUDDialog(new CRUDDialog.Resulet() {
                 @Override
                 public void result(CRUDDialogConfig crudDialogConfig) {
                     if (crudDialogConfig.getTableName() == null || crudDialogConfig.getTableName().equals("")) {
@@ -47,7 +48,12 @@ public class MybatisResetCURDAction extends AnAction {
                                 Messages.getErrorIcon()
                         );
                     } else {
-                        readData(eventFile,crudDialogConfig);
+                        crudDialog.getProgressLabel().setText("开始写入..");
+                        crudDialog.getProgressBar().setValue(30);
+                        writeData(eventFile,crudDialogConfig);
+                        crudDialog.getProgressBar().setValue(100);
+                        ProjectUtil.invate();
+                        crudDialog.onCancel();
                     }
                 }
             });
@@ -97,6 +103,11 @@ public class MybatisResetCURDAction extends AnAction {
                             ex.printStackTrace();
                         }
                     }
+
+                    @Override
+                    public void error(String info) {
+                        crudDialog.getProgressLabel().setText("读取失败!");
+                    }
                 });
                 super.run();
             }
@@ -104,17 +115,21 @@ public class MybatisResetCURDAction extends AnAction {
     }
 
 
-    private void readData(VirtualFile file,  CRUDDialogConfig crudDialogConfig) {
+    private void writeData(VirtualFile file, CRUDDialogConfig crudDialogConfig) {
         ReaderXML.read(file.getPath(), new ReaderXML.XMLInterface() {
             @Override
             public void update(Document document) {
                 try {
                     runConfigure(document, crudDialogConfig);
                     ReaderXML.writer(document, file.getParent().getPath() + "/" + file.getName());
-                    ProjectUtil.invate();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+            }
+
+            @Override
+            public void error(String info) {
+                crudDialog.getProgressLabel().setText("读取失败!");
             }
         });
     }
@@ -176,7 +191,7 @@ public class MybatisResetCURDAction extends AnAction {
             }
         }
         StringBuilder paramBuilder=createParamBuilder(strings,rootElement);
-        rootElement.addText("\n"+outSideBlank+"<!--"+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
+        rootElement.addText("\n"+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
 
         StrBuilder setBuilder =new StrBuilder();
         String logicDeleteSql = "";
@@ -221,7 +236,7 @@ public class MybatisResetCURDAction extends AnAction {
         }
         StringBuilder paramBuilder=createParamBuilder(strings,rootElement);
         StrBuilder setBuilder=createSetBuilder(attributes);
-        rootElement.addText("\n"+outSideBlank+"<!--"+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
+        rootElement.addText("\n"+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
         select.setText("\n"+contentBlank+"update * from " + crudDialogConfig.getTableName()+setBuilder.toString()+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
         rootElement.add(select);
     }
@@ -271,7 +286,7 @@ public class MybatisResetCURDAction extends AnAction {
             }
         }
         StringBuilder paramBuilder=createParamBuilder(strings,rootElement);
-        rootElement.addText("\n"+outSideBlank+"<!--"+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
+        rootElement.addText("\n"+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
 
         select.setText("\n"+contentBlank+"select * from " + crudDialogConfig.getTableName()+contentBlank+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
         rootElement.add(select);
@@ -511,8 +526,8 @@ public class MybatisResetCURDAction extends AnAction {
                 try {
                     CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig("table",false,false,false,false,false,"delete_flag","0","1");
                     crudDialogConfig.setSelectByTextField("name,deadline");
-                    crudDialogConfig.setDeleteByTextField("name,deadline");
-                    crudDialogConfig.setUpdateByTextField("name,deadline");
+                    //crudDialogConfig.setDeleteByTextField("name,deadline");
+                    //crudDialogConfig.setUpdateByTextField("name,deadline");
                    // removeAllButCloumn(document);
                     runConfigure(document,crudDialogConfig);
 
@@ -520,6 +535,11 @@ public class MybatisResetCURDAction extends AnAction {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+            }
+
+            @Override
+            public void error(String info) {
+
             }
         });
     }

@@ -24,6 +24,7 @@ public class CRUDDialog extends JDialog {
     private JTextField updateByTextField;
     private JTextField deleteByTextField;
     private JProgressBar progressBar;
+    private JLabel progressLabel;
 
 
     public interface Resulet{
@@ -69,7 +70,7 @@ public class CRUDDialog extends JDialog {
 
     private void onOK(ActionEvent event) {
         // add your code here
-        dispose();
+        //dispose();
         CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig(textField1.getText(),select_mothedCheckBox.isSelected(),delete_mothedCheckBox.isSelected(),update_mothedCheckBox.isSelected(),create_return_idCheckBox.isSelected(),deleteFlagCheckBox.isSelected(),delete_flagTextField.getText(),deletedTextField.getText(),unDeleteTextField.getText());
         crudDialogConfig.setCountByCondition(countByConditionCheckBox.isSelected());
         crudDialogConfig.setSelectByCondition(selectByConditionCheckBox.isSelected());
@@ -81,7 +82,7 @@ public class CRUDDialog extends JDialog {
         resulet.result(crudDialogConfig);
     }
 
-    private void onCancel() {
+    public void onCancel() {
         // add your code here if necessary
         dispose();
     }
@@ -113,5 +114,9 @@ public class CRUDDialog extends JDialog {
 
     public JProgressBar getProgressBar() {
         return progressBar;
+    }
+
+    public JLabel getProgressLabel() {
+        return progressLabel;
     }
 }

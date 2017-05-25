@@ -1,31 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace="com.itfin.platform.dao.product.ProductMapper">
-    <resultMap id="BaseResultMap" type="com.itfin.platform.domain.model.Product">
-        <id column="id" jdbcType="INTEGER" property="id"/>
-        <result column="serial_num" jdbcType="VARCHAR" property="serialNum"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
-        <result column="deadline" jdbcType="INTEGER" property="deadline"/>
-        <result column="rate" jdbcType="DOUBLE" property="rate"/>
-        <result column="platform_add_rate" jdbcType="DOUBLE" property="platformAddRate"/>
-        <result column="min_quota" jdbcType="INTEGER" property="minQuota"/>
-        <result column="max_quota" jdbcType="INTEGER" property="maxQuota"/>
-        <result column="step_quota" jdbcType="INTEGER" property="stepQuota"/>
-        <result column="target_amount" jdbcType="INTEGER" property="targetAmount"/>
-        <result column="collected_amount" jdbcType="INTEGER" property="collectedAmount"/>
-        <result column="remain_amount" jdbcType="INTEGER" property="remainAmount"/>
-        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="shelve_date" jdbcType="TIMESTAMP" property="shelveDate"/>
-        <result column="unshelve_date" jdbcType="TIMESTAMP" property="unshelveDate"/>
-        <result column="end_date" jdbcType="TIMESTAMP" property="endDate"/>
-        <result column="pay_back_date" jdbcType="TIMESTAMP" property="payBackDate"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
-        <result column="red_packet_limit" jdbcType="INTEGER" property="redPacketLimit"/>
-        <result column="type" jdbcType="INTEGER" property="type"/>
-        <result column="interest_mode_type" jdbcType="INTEGER" property="interestModeType"/>
-        <result column="interest_time_type" jdbcType="INTEGER" property="interestTimeType"/>
-        <result column="status" jdbcType="INTEGER" property="status"/>
-        <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag"/>
-    </resultMap>
-</mapper>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"><mapper namespace="com.itfin.platform.dao.product.ProductMapper"><resultMap id="BaseResultMap" type="com.itfin.platform.domain.model.Product"><id column="id" jdbcType="INTEGER" property="id"/><result column="serial_num" jdbcType="VARCHAR" property="serialNum"/><result column="name" jdbcType="VARCHAR" property="name"/><result column="deadline" jdbcType="INTEGER" property="deadline"/><result column="rate" jdbcType="DOUBLE" property="rate"/><result column="platform_add_rate" jdbcType="DOUBLE" property="platformAddRate"/><result column="min_quota" jdbcType="INTEGER" property="minQuota"/><result column="max_quota" jdbcType="INTEGER" property="maxQuota"/><result column="step_quota" jdbcType="INTEGER" property="stepQuota"/><result column="target_amount" jdbcType="INTEGER" property="targetAmount"/><result column="collected_amount" jdbcType="INTEGER" property="collectedAmount"/><result column="remain_amount" jdbcType="INTEGER" property="remainAmount"/><result column="create_time" jdbcType="TIMESTAMP" property="createTime"/><result column="shelve_date" jdbcType="TIMESTAMP" property="shelveDate"/><result column="unshelve_date" jdbcType="TIMESTAMP" property="unshelveDate"/><result column="end_date" jdbcType="TIMESTAMP" property="endDate"/><result column="pay_back_date" jdbcType="TIMESTAMP" property="payBackDate"/><result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/><result column="red_packet_limit" jdbcType="INTEGER" property="redPacketLimit"/><result column="type" jdbcType="INTEGER" property="type"/><result column="interest_mode_type" jdbcType="INTEGER" property="interestModeType"/><result column="interest_time_type" jdbcType="INTEGER" property="interestTimeType"/><result column="status" jdbcType="INTEGER" property="status"/><result column="delete_flag" jdbcType="INTEGER" property="deleteFlag"/></resultMap><!--build by plugin: com.itfin.platform.domain.model.Product selectByNameAndDeadline(Param("name")String name,Param("deadline")Integer deadline);--><select id="selectByNameAndDeadline" resultMap="BaseResultMap">
+        select * from table        
+        where name = #{name}
+        and deadline = #{deadline}
+        and delete_flag = 1
+    </select>
+    <!--build by plugin: com.itfin.platform.domain.model.Product selectByNameAndDeadline(Param("name")String name,Param("deadline")Integer deadline);-->
+ <select id="selectByNameAndDeadline" resultMap="BaseResultMap">
+        select * from table        
+        where name = #{name}
+        and deadline = #{deadline}
+        and delete_flag = 1
+    </select></mapper>
