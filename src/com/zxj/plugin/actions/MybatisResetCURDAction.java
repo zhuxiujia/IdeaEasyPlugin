@@ -36,6 +36,7 @@ public class MybatisResetCURDAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent event) {
         // Does nothing
+        ProjectUtil.invate();
         VirtualFile eventFile = FileUtil.getFile(event.getDataContext());
         String extension = eventFile.getExtension();
 
