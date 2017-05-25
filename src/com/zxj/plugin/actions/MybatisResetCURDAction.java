@@ -56,8 +56,11 @@ public class MybatisResetCURDAction extends AnAction {
                         crudDialog.onCancel();
                     }
                 }
-            });
-            startJobSetData(crudDialog,eventFile);
+                 @Override
+                 public void onLoad() {
+                     startJobSetData(crudDialog,eventFile);
+                 }
+             });
             crudDialog.pack();
             crudDialog.setVisible(true);
         } else {
@@ -138,14 +141,14 @@ public class MybatisResetCURDAction extends AnAction {
     private static void runConfigure(Document document,  CRUDDialogConfig crudDialogConfig) throws Exception {
 
         Element rootElement = document.getRootElement();
-        List<Element> elementList = rootElement.elements();
-        for (Element element : elementList) {// <result <select
-            if (checkNeedRemove(element)) {// remove
-                // delete
-                element.getParent().remove(element);
-                System.out.println("delete element:" + element.attribute("id").getValue());
-            }
-        }
+       // List<Element> elementList = rootElement.elements();
+//        for (Element element : elementList) {// <result <select
+//            if (checkNeedRemove(element)) {// remove
+//                // delete
+//                element.getParent().remove(element);
+//                System.out.println("delete element:" + element.attribute("id").getValue());
+//            }
+//        }
         if (crudDialogConfig.isSelect()) addSelect(rootElement, crudDialogConfig);
         if (crudDialogConfig.isDelete()) addDelete(rootElement, crudDialogConfig);
         if (crudDialogConfig.isUpdate()) addUpdate(rootElement, crudDialogConfig);

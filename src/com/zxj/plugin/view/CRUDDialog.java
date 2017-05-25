@@ -25,10 +25,16 @@ public class CRUDDialog extends JDialog {
     private JTextField deleteByTextField;
     private JProgressBar progressBar;
     private JLabel progressLabel;
+    private JButton loadButton;
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 
 
     public interface Resulet{
         void result(CRUDDialogConfig crudDialogConfig);
+        void onLoad();
     }
 
 
@@ -49,6 +55,12 @@ public class CRUDDialog extends JDialog {
         buttonCancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onCancel();
+            }
+        });
+        loadButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resulet.onLoad();
             }
         });
 
@@ -93,6 +105,11 @@ public class CRUDDialog extends JDialog {
             public void result(CRUDDialogConfig crudDialogConfig) {
 
                 System.out.println();
+            }
+
+            @Override
+            public void onLoad() {
+
             }
         });
         dialog.pack();
