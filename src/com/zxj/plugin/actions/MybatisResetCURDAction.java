@@ -180,7 +180,7 @@ public class MybatisResetCURDAction extends AnAction {
             }
         }
         select.addAttribute("id", nameBuilder.toString());
-        select.addAttribute("resultMap", "BaseResultMap");
+        //select.addAttribute("resultMap", "BaseResultMap");
 
         StrBuilder sqlBuilder =new StrBuilder();
         for (int i=0;i<strings.length;i++){
@@ -221,7 +221,7 @@ public class MybatisResetCURDAction extends AnAction {
             }
         }
         select.addAttribute("id", nameBuilder.toString());
-        select.addAttribute("resultMap", "BaseResultMap");
+        //select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";
         if (!crudDialogConfig.isDeleteFlag()) {
             logicDeleteCode = "\n"+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
@@ -526,8 +526,8 @@ public class MybatisResetCURDAction extends AnAction {
                 try {
                     CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig("table",false,false,false,false,false,"delete_flag","0","1");
                     crudDialogConfig.setSelectByTextField("name,deadline");
-                    //crudDialogConfig.setDeleteByTextField("name,deadline");
-                    //crudDialogConfig.setUpdateByTextField("name,deadline");
+                    crudDialogConfig.setDeleteByTextField("name,deadline");
+                    crudDialogConfig.setUpdateByTextField("name,deadline");
                    // removeAllButCloumn(document);
                     runConfigure(document,crudDialogConfig);
 
