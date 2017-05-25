@@ -1,5 +1,8 @@
 package com.zxj.plugin.actions;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import com.intellij.openapi.ui.Messages;
@@ -80,38 +83,42 @@ public class MybatisResetCURDAction extends AnAction {
             @Override
             public void run() {
                 crudDialog.getProgressBar().setValue(30);
-                ReaderXML.read(virtualFile.getPath(), new ReaderXML.XMLInterface() {
-                    @Override
-                    public void update(Document document) {
-                        try {
-                            crudDialog.getProgressBar().setValue(100);
-                            Element rootElement=document.getRootElement();
-                            String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
-                            List<Element> attributes = rootElement.element("resultMap").elements("result");
-                            StrBuilder strBuilder=new StrBuilder();
-                            for (int i=0;i<attributes.size();i++){
-                                Element element=attributes.get(i);
-                                String column = element.attributeValue("column");
-                                String jdbcType = element.attributeValue("jdbcType");
-                                String property = element.attributeValue("property");
-                                strBuilder.append(property);
-                                if(i!=(attributes.size()-1)){
-                                    strBuilder.append(",");
+                try {
+                    ReaderXML.read(virtualFile.getInputStream(), new ReaderXML.XMLInterface() {
+                        @Override
+                        public void update(Document document) {
+                            try {
+                                crudDialog.getProgressBar().setValue(100);
+                                Element rootElement=document.getRootElement();
+                                String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
+                                List<Element> attributes = rootElement.element("resultMap").elements("result");
+                                StrBuilder strBuilder=new StrBuilder();
+                                for (int i=0;i<attributes.size();i++){
+                                    Element element=attributes.get(i);
+                                    String column = element.attributeValue("column");
+                                    String jdbcType = element.attributeValue("jdbcType");
+                                    String property = element.attributeValue("property");
+                                    strBuilder.append(property);
+                                    if(i!=(attributes.size()-1)){
+                                        strBuilder.append(",");
+                                    }
                                 }
+                                crudDialog.getSelectByTextField().setText(strBuilder.toString());
+                                crudDialog.getUpdateByTextField().setText(strBuilder.toString());
+                                crudDialog.getDeleteByTextField().setText(strBuilder.toString());
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
                             }
-                            crudDialog.getSelectByTextField().setText(strBuilder.toString());
-                            crudDialog.getUpdateByTextField().setText(strBuilder.toString());
-                            crudDialog.getDeleteByTextField().setText(strBuilder.toString());
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
                         }
-                    }
 
-                    @Override
-                    public void error(String info) {
-                        crudDialog.getProgressLabel().setText("读取失败!");
-                    }
-                });
+                        @Override
+                        public void error(String info) {
+                            crudDialog.getProgressLabel().setText("读取失败!");
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 super.run();
             }
         }.start();
@@ -119,22 +126,26 @@ public class MybatisResetCURDAction extends AnAction {
 
 
     private void writeData(VirtualFile file, CRUDDialogConfig crudDialogConfig) {
-        ReaderXML.read(file.getPath(), new ReaderXML.XMLInterface() {
-            @Override
-            public void update(Document document) {
-                try {
-                    runConfigure(document, crudDialogConfig);
-                    ReaderXML.writer(document, file.getParent().getPath() + "/" + file.getName());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+        try {
+            ReaderXML.read(file.getInputStream(), new ReaderXML.XMLInterface() {
+                @Override
+                public void update(Document document) {
+                    try {
+                        runConfigure(document, crudDialogConfig);
+                        ReaderXML.writer(document, file.getParent().getPath() + "/" + file.getName());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
-            }
 
-            @Override
-            public void error(String info) {
-                crudDialog.getProgressLabel().setText("读取失败!");
-            }
-        });
+                @Override
+                public void error(String info) {
+                    crudDialog.getProgressLabel().setText("读取失败!");
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -522,8 +533,9 @@ public class MybatisResetCURDAction extends AnAction {
         return true;
     }
 
-    public static void main(String[] arsg){
-        ReaderXML.read("D:\\java\\remot\\IdeaEasyPlugin\\test\\ProductMapper_new.xml", new ReaderXML.XMLInterface() {
+    public static void main(String[] arsg) throws FileNotFoundException {
+        FileInputStream fileInputStream=new FileInputStream("D:\\java\\remot\\IdeaEasyPlugin\\test\\ProductMapper_new.xml");
+        ReaderXML.read(fileInputStream, new ReaderXML.XMLInterface() {
             @Override
             public void update(Document document) {
                 try {
