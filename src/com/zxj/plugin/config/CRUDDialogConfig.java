@@ -22,6 +22,11 @@ public class CRUDDialogConfig {
     String deletedStr;
     String unDeletedStr;
 
+
+    String  selectByTextField;
+    String updateByTextField;
+    String deleteByTextField;
+
     public CRUDDialogConfig(String tableName,boolean select,boolean delete,boolean update,boolean create,boolean deleteFlag,String deleteFlagStr,String deletedStr,String unDeletedStr){
         this.select=select;
         this.delete=delete;
@@ -85,5 +90,29 @@ public class CRUDDialogConfig {
 
     public void setSelectByCondition(boolean selectByCondition) {
         this.selectByCondition = selectByCondition;
+    }
+
+    public void setDeleteByTextField(String deleteByTextField) {
+        this.deleteByTextField = deleteByTextField;
+    }
+
+    public void setUpdateByTextField(String updateByTextField) {
+        this.updateByTextField = updateByTextField;
+    }
+
+    public void setSelectByTextField(String selectByTextField) {
+        this.selectByTextField = selectByTextField;
+    }
+
+    public String getDeleteByTextField() {
+        return deleteByTextField;
+    }
+
+    public String getSelectByTextField() {
+        return selectByTextField;
+    }
+
+    public String getUpdateByTextField() {
+        return updateByTextField;
     }
 }

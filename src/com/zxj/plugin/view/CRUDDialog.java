@@ -20,9 +20,10 @@ public class CRUDDialog extends JDialog {
     private JTextField deletedTextField;
     private JCheckBox selectByConditionCheckBox;
     private JCheckBox countByConditionCheckBox;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JTextField textField4;
+    private JTextField selectByTextField;
+    private JTextField updateByTextField;
+    private JTextField deleteByTextField;
+    private JProgressBar progressBar;
 
 
     public interface Resulet{
@@ -72,6 +73,11 @@ public class CRUDDialog extends JDialog {
         CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig(textField1.getText(),select_mothedCheckBox.isSelected(),delete_mothedCheckBox.isSelected(),update_mothedCheckBox.isSelected(),create_return_idCheckBox.isSelected(),deleteFlagCheckBox.isSelected(),delete_flagTextField.getText(),deletedTextField.getText(),unDeleteTextField.getText());
         crudDialogConfig.setCountByCondition(countByConditionCheckBox.isSelected());
         crudDialogConfig.setSelectByCondition(selectByConditionCheckBox.isSelected());
+
+        crudDialogConfig.setSelectByTextField(selectByTextField.getText().toString());
+        crudDialogConfig.setUpdateByTextField(updateByTextField.getText().toString());
+        crudDialogConfig.setDeleteByTextField(deleteByTextField.getText().toString());
+
         resulet.result(crudDialogConfig);
     }
 
@@ -91,5 +97,21 @@ public class CRUDDialog extends JDialog {
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
+    }
+
+    public JTextField getSelectByTextField() {
+        return selectByTextField;
+    }
+
+    public JTextField getUpdateByTextField() {
+        return updateByTextField;
+    }
+
+    public JTextField getDeleteByTextField() {
+        return deleteByTextField;
+    }
+
+    public JProgressBar getProgressBar() {
+        return progressBar;
     }
 }

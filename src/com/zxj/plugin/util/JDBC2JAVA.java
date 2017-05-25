@@ -51,4 +51,9 @@ public class JDBC2JAVA {
     public static String getJAVAValue(String jdbcTYPE) {
         return JDBCs.get(jdbcTYPE);
     }
+    public static String getJAVAValueShort(String jdbcTYPE) {
+        String va= JDBCs.get(jdbcTYPE);
+        if(va!=null)va=va.substring(va.lastIndexOf(".")+1,va.length());
+        return va;
+    }
 }

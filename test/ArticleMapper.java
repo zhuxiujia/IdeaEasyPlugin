@@ -35,4 +35,5 @@ public interface ArticleMapper {
                                     @Param("objType") Integer objType,
                                     @Param("objId") Integer objId);
 	int updateById(Article record);
+
 }
