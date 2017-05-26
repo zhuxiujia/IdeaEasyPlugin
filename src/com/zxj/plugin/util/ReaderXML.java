@@ -1,9 +1,6 @@
 package com.zxj.plugin.util;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
@@ -20,18 +17,15 @@ public class ReaderXML {
 
     }
 
-    public static void read(String filePath, XMLInterface xmlInterface) {
+    public static void read(InputStream inputStream, XMLInterface xmlInterface) {
         try {
             // 3。获取文件
-            System.out.println("load xml path:" + filePath);
-            File file = new File(filePath);
-            Document document = reader.read(file);
+            Document document = reader.read(inputStream);
             document.setXMLEncoding("UTF-8");
             xmlInterface.update(document);
         } catch (Exception e) {
             xmlInterface.error(e.getMessage());
             e.printStackTrace();
-            System.out.println("load file fail:" + filePath);
         }
     }
 
