@@ -182,10 +182,10 @@ public class MybatisResetCURDAction extends AnAction {
         String returnObj=rootElement.element("resultMap").attributeValue("type");
         Element delete = null;
         if(crudDialogConfig.isDeleteFlag()){
-            delete =new BaseElement("delete");
-        }else {
             delete =new BaseElement("update");
             delete.addAttribute("resultType", "java.lang.Integer");
+        }else {
+            delete =new BaseElement("delete");
         }
         StrBuilder nameBuilder =new StrBuilder();
         for (int f=0;f<strings.length;f++){
