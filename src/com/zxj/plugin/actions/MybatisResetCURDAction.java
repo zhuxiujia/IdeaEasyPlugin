@@ -180,11 +180,12 @@ public class MybatisResetCURDAction extends AnAction {
         String[] strings=crudDialogConfig.getSelectByTextField().split(",");
         List<Element> attributes = rootElement.element("resultMap").elements("result");
         String returnObj=rootElement.element("resultMap").attributeValue("type");
-        Element select = null;
+        Element delete = null;
         if(crudDialogConfig.isDeleteFlag()){
-            select=new BaseElement("delete");
+            delete =new BaseElement("delete");
         }else {
-            select=new BaseElement("update");
+            delete =new BaseElement("update");
+            delete.addAttribute("resultType", "java.lang.Integer");
         }
         StrBuilder nameBuilder =new StrBuilder();
         for (int f=0;f<strings.length;f++){
@@ -194,7 +195,7 @@ public class MybatisResetCURDAction extends AnAction {
                 nameBuilder.append("And").append(StringUtil.upFirstChar(strings[f]));
             }
         }
-        select.addAttribute("id", nameBuilder.toString());
+        delete.addAttribute("id", nameBuilder.toString());
         //select.addAttribute("resultMap", "BaseResultMap");
 
         StrBuilder sqlBuilder =new StrBuilder();
@@ -218,15 +219,18 @@ public class MybatisResetCURDAction extends AnAction {
             action="delete  from ";
             logicDeleteSql = "\n"+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
         }
-        select.setText("\n"+contentBlank+action + crudDialogConfig.getTableName()+contentBlank+ setBuilder.toString()+sqlBuilder.toString()+ logicDeleteSql +"\n"+outSideBlank);
-        rootElement.add(select);
+        delete.setText("\n"+contentBlank+action + crudDialogConfig.getTableName()+contentBlank+ setBuilder.toString()+sqlBuilder.toString()+ logicDeleteSql +"\n"+outSideBlank);
+        rootElement.add(delete);
     }
 
     private static void addUpdateBy(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String[] strings=crudDialogConfig.getSelectByTextField().split(",");
         List<Element> attributes = rootElement.element("resultMap").elements("result");
+
+
         String returnObj=rootElement.element("resultMap").attributeValue("type");
-        Element select = new BaseElement("update");
+        Element update = new BaseElement("update");
+        update.addAttribute("resultType", "java.lang.Integer");
         StrBuilder nameBuilder =new StrBuilder();
         for (int f=0;f<strings.length;f++){
             if(f==0){
@@ -235,7 +239,7 @@ public class MybatisResetCURDAction extends AnAction {
                 nameBuilder.append("And").append(StringUtil.upFirstChar(strings[f]));
             }
         }
-        select.addAttribute("id", nameBuilder.toString());
+        update.addAttribute("id", nameBuilder.toString());
         //select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";
         if (crudDialogConfig.isDeleteFlag()) {
@@ -252,8 +256,8 @@ public class MybatisResetCURDAction extends AnAction {
         StringBuilder paramBuilder=createParamBuilder(strings,rootElement);
         StrBuilder setBuilder=createSetBuilder(attributes);
         rootElement.addText("\n"+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
-        select.setText("\n"+contentBlank+"update * from " + crudDialogConfig.getTableName()+setBuilder.toString()+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
-        rootElement.add(select);
+        update.setText("\n"+contentBlank+"update * from " + crudDialogConfig.getTableName()+setBuilder.toString()+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
+        rootElement.add(update);
     }
 
     private static StrBuilder createSetBuilder(List<Element> attributes) {
@@ -492,8 +496,7 @@ public class MybatisResetCURDAction extends AnAction {
         String idCloumn=rootElement.element("resultMap").element("id").getName();
         Element select = new BaseElement("select");
         select.addAttribute("id", "countByCondition");
-        //select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-        select.addAttribute("resultMap", "BaseResultMap");
+        select.addAttribute("resultType", "java.lang.Integer");
         String logicDeleteCode = null;//逻辑删除
         if (crudDialogConfig.isDeleteFlag()) {
             logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
