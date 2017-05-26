@@ -211,7 +211,7 @@ public class MybatisResetCURDAction extends AnAction {
         StrBuilder setBuilder =new StrBuilder();
         String logicDeleteSql = "";
         String action=null;
-        if(!crudDialogConfig.isDeleteFlag()){
+        if(crudDialogConfig.isDeleteFlag()){
             action="update * from ";
             setBuilder.append("\n"+contentBlank+"set "+ crudDialogConfig.getDeleteFlagStr()+" = "+crudDialogConfig.getDeletedStr());
         }else {
@@ -238,7 +238,7 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("id", nameBuilder.toString());
         //select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";
-        if (!crudDialogConfig.isDeleteFlag()) {
+        if (crudDialogConfig.isDeleteFlag()) {
             logicDeleteCode = "\n"+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
         }
         StrBuilder sqlBuilder =new StrBuilder();
@@ -289,7 +289,7 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("id", nameBuilder.toString());
         select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";
-        if (!crudDialogConfig.isDeleteFlag()) {
+        if (crudDialogConfig.isDeleteFlag()) {
             logicDeleteCode = "\n"+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
         }
        StrBuilder sqlBuilder =new StrBuilder();
