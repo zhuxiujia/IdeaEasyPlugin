@@ -29,20 +29,6 @@
         <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag"/>
     </resultMap>
     <!--build by plugin: com.itfin.platform.domain.model.Product selectByNameAndDeadline(Param("name")String name,Param("deadline")Integer deadline);-->
-    <select id="selectByNameAndDeadline" resultMap="BaseResultMap">
-        select * from table        
-        where name = #{name}
-        and deadline = #{deadline}
-        and delete_flag = 1
-    </select>
-    <!--build by plugin: com.itfin.platform.domain.model.Product selectByNameAndDeadline(Param("name")String name,Param("deadline")Integer deadline);-->
-    <select id="selectByNameAndDeadline" resultMap="BaseResultMap">
-        select * from table        
-        where name = #{name}
-        and deadline = #{deadline}
-        and delete_flag = 1
-    </select>
-    <!--build by plugin: com.itfin.platform.domain.model.Product selectByNameAndDeadline(Param("name")String name,Param("deadline")Integer deadline);-->
      <select id="selectByNameAndDeadline" resultMap="BaseResultMap">
         select * from table        
         where name = #{name}
@@ -50,7 +36,7 @@
         and delete_flag = 1
     </select>
     <!--build by plugin: com.itfin.platform.domain.model.Product selectByNameAndDeadline(Param("name")String name,Param("deadline")Integer deadline);-->
-     <update id="selectByNameAndDeadline" resultMap="BaseResultMap">
+     <update id="selectByNameAndDeadline">
         update * from table
         <set>
             <if test="serialNum != null">serial_num = #{serialNum,jdbcType=VARCHAR},</if>
@@ -82,7 +68,7 @@
         and delete_flag = 1
     </update>
     <!--build by plugin: com.itfin.platform.domain.model.Product deleteByNameAndDeadline(Param("name")String name,Param("deadline")Integer deadline);-->
-     <update id="deleteByNameAndDeadline" resultMap="BaseResultMap">
+     <update id="deleteByNameAndDeadline">
         update * from table        
         set delete_flag = 0
         where name = #{name}

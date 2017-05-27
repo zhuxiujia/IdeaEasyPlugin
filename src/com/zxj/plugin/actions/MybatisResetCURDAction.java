@@ -24,9 +24,10 @@ import com.intellij.openapi.vfs.VirtualFile;
  */
 public class MybatisResetCURDAction extends AnAction {
    private static   String contentBlank="        ";
-   private static String contentBlank2="            ";
+   private static String contentBlank2="      ";
     private static  String outSideBlank="    ";
 
+    private static String newLine="\n";
     CRUDDialog crudDialog =null;
     @Override
     public void update(AnActionEvent event) {
@@ -153,7 +154,7 @@ public class MybatisResetCURDAction extends AnAction {
     private static void runConfigure(Document document,  CRUDDialogConfig crudDialogConfig) throws Exception {
 
         Element rootElement = document.getRootElement();
-       // List<Element> elementList = rootElement.elements();
+//        List<Element> elementList = rootElement.elements();
 //        for (Element element : elementList) {// <result <select
 //            if (checkNeedRemove(element)) {// remove
 //                // delete
@@ -161,6 +162,8 @@ public class MybatisResetCURDAction extends AnAction {
 //                System.out.println("delete element:" + element.attribute("id").getValue());
 //            }
 //        }
+
+        deleteH(rootElement);
         if (crudDialogConfig.isSelect()) addSelect(rootElement, crudDialogConfig);
         if (crudDialogConfig.isDelete()) addDelete(rootElement, crudDialogConfig);
         if (crudDialogConfig.isUpdate()) addUpdate(rootElement, crudDialogConfig);
@@ -172,8 +175,23 @@ public class MybatisResetCURDAction extends AnAction {
         if(crudDialogConfig.getSelectByTextField()!=null&&!crudDialogConfig.getSelectByTextField().equals("")){addSelectBy(rootElement,crudDialogConfig);}
         if(crudDialogConfig.getUpdateByTextField()!=null&&!crudDialogConfig.getUpdateByTextField().equals("")){addUpdateBy(rootElement,crudDialogConfig);}
         if(crudDialogConfig.getDeleteByTextField()!=null&&!crudDialogConfig.getDeleteByTextField().equals("")){addDeleteBy(rootElement,crudDialogConfig);}
-        System.out.println(document.toString());
+
+
         System.out.println("success");
+    }
+
+    private static void deleteH(Element rootElement) {
+        List<Element> elements= rootElement.elements();
+       if(elements.size()!=0)for (Element element:elements){
+            deal(element);
+            if(element.elements().size()!=0)deleteH(element);
+       }
+    }
+
+    private static void deal(Element element) {
+        if(element.elements().size()>0) {
+            element.setText(element.getText().replaceAll(newLine, ""));
+        }
     }
 
     private static void addDeleteBy(Element rootElement, CRUDDialogConfig crudDialogConfig) {
@@ -200,25 +218,25 @@ public class MybatisResetCURDAction extends AnAction {
         StrBuilder sqlBuilder =new StrBuilder();
         for (int i=0;i<strings.length;i++){
             if(i==0){
-                sqlBuilder.append("\n"+contentBlank+"where "+ getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");}
+                sqlBuilder.append(newLine+contentBlank+"where "+ getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");}
             else {
-                sqlBuilder.append("\n"+contentBlank+"and "+getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");
+                sqlBuilder.append(newLine+contentBlank+"and "+getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");
             }
         }
         StringBuilder paramBuilder=createParamBuilder(strings,rootElement);
-        rootElement.addText("\n"+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
+        rootElement.addText(newLine+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->"+newLine);
 
         StrBuilder setBuilder =new StrBuilder();
         String logicDeleteSql = "";
         String action=null;
         if(!crudDialogConfig.isDeleteFlag()){
             action="update * from ";
-            setBuilder.append("\n"+contentBlank+"set "+ crudDialogConfig.getDeleteFlagStr()+" = "+crudDialogConfig.getDeletedStr());
+            setBuilder.append(newLine+contentBlank+"set "+ crudDialogConfig.getDeleteFlagStr()+" = "+crudDialogConfig.getDeletedStr());
         }else {
             action="delete  from ";
-            logicDeleteSql = "\n"+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+            logicDeleteSql = newLine+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
         }
-        select.setText("\n"+contentBlank+action + crudDialogConfig.getTableName()+contentBlank+ setBuilder.toString()+sqlBuilder.toString()+ logicDeleteSql +"\n"+outSideBlank);
+        select.setText(newLine+contentBlank+action + crudDialogConfig.getTableName()+contentBlank+ setBuilder.toString()+sqlBuilder.toString()+ logicDeleteSql +newLine+outSideBlank);
         rootElement.add(select);
     }
 
@@ -239,20 +257,20 @@ public class MybatisResetCURDAction extends AnAction {
         //select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";
         if (!crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = "\n"+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+            logicDeleteCode = newLine+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
         }
         StrBuilder sqlBuilder =new StrBuilder();
         for (int i=0;i<strings.length;i++){
             if(i==0){
-                sqlBuilder.append("\n"+contentBlank+"where "+ getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");}
+                sqlBuilder.append(newLine+contentBlank+"where "+ getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");}
             else {
-                sqlBuilder.append("\n"+contentBlank+"and "+getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");
+                sqlBuilder.append(newLine+contentBlank+"and "+getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");
             }
         }
         StringBuilder paramBuilder=createParamBuilder(strings,rootElement);
         StrBuilder setBuilder=createSetBuilder(attributes);
-        rootElement.addText("\n"+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
-        select.setText("\n"+contentBlank+"update * from " + crudDialogConfig.getTableName()+setBuilder.toString()+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
+        rootElement.addText(newLine+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->"+newLine);
+        select.setText(newLine+contentBlank+"update * from " + crudDialogConfig.getTableName()+setBuilder.toString()+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
         rootElement.add(select);
     }
 
@@ -266,9 +284,9 @@ public class MybatisResetCURDAction extends AnAction {
             String property = element.attributeValue("property");
             _if.addAttribute("test", property + " != null");
             _if.setText(column + " = #{" + property + ",jdbcType=" + jdbcType + "},");
-            if(index==0) setBuilder.append("\n").append(contentBlank).append("<set>");
-            setBuilder.append("\n").append(contentBlank2).append(_if.asXML().toString());
-            if(index==(attributes.size()-1)) setBuilder.append("\n").append(contentBlank).append("</set>");
+            if(index==0) setBuilder.append(newLine).append(contentBlank).append("<set>");
+            setBuilder.append(newLine).append(contentBlank2).append(_if.asXML().toString());
+            if(index==(attributes.size()-1)) setBuilder.append(newLine).append(contentBlank).append("</set>");
         }
         return setBuilder;
     }
@@ -290,20 +308,20 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";
         if (!crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = "\n"+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+            logicDeleteCode = newLine+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
         }
        StrBuilder sqlBuilder =new StrBuilder();
         for (int i=0;i<strings.length;i++){
             if(i==0){
-                sqlBuilder.append("\n"+contentBlank+"where "+ getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");}
+                sqlBuilder.append(newLine+contentBlank+"where "+ getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");}
             else {
-                sqlBuilder.append("\n"+contentBlank+"and "+getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");
+                sqlBuilder.append(newLine+contentBlank+"and "+getColumnByProperty(attributes,strings[i])+" = #{"+strings[i]+"}");
             }
         }
         StringBuilder paramBuilder=createParamBuilder(strings,rootElement);
-        rootElement.addText("\n"+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->\n");
+        rootElement.addText(newLine+outSideBlank+"<!--build by plugin: "+returnObj+" "+ nameBuilder.toString()+"("+paramBuilder.toString()+");-->"+newLine);
 
-        select.setText("\n"+contentBlank+"select * from " + crudDialogConfig.getTableName()+contentBlank+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
+        select.setText(newLine+contentBlank+"select * from " + crudDialogConfig.getTableName()+contentBlank+ sqlBuilder.toString()+ logicDeleteCode+outSideBlank);
         rootElement.add(select);
     }
 
@@ -373,9 +391,9 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";
         if (crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+            logicDeleteCode = contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
         }
-        select.setText("\n"+contentBlank+"select * from " + crudDialogConfig.getTableName() + "\n"+contentBlank+"where id = #{id,jdbcType=INTEGER}\n" + logicDeleteCode+outSideBlank);
+        select.setText(newLine+contentBlank+"select * from " + crudDialogConfig.getTableName() + newLine+contentBlank+"where id = #{id,jdbcType=INTEGER}"+newLine + logicDeleteCode+outSideBlank);
         rootElement.add(select);
     }
 
@@ -387,13 +405,13 @@ public class MybatisResetCURDAction extends AnAction {
             select.addAttribute("id", "deleteById");
             select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
             //select.addAttribute("resultMap", "BaseResultMap");
-            String logicDeleteCode = "\n" + contentBlank + "set " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getDeletedStr() + "\n";
-            select.setText("\n" + contentBlank + "update " + crudDialogConfig.getTableName() + logicDeleteCode + contentBlank + "where id = #{id,jdbcType=INTEGER}\n" + outSideBlank);
+            String logicDeleteCode = newLine + contentBlank + "set " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getDeletedStr() + newLine;
+            select.setText(newLine + contentBlank + "update " + crudDialogConfig.getTableName() + logicDeleteCode + contentBlank + "where id = #{id,jdbcType=INTEGER}"+newLine + outSideBlank);
         }else {
              select = new BaseElement("delete");
             select.addAttribute("id", "deleteById");
             select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-            select.setText("\n" + contentBlank + "delete from " + crudDialogConfig.getTableName()   + " where id = #{id,jdbcType=INTEGER}\n" + outSideBlank);
+            select.setText(newLine + contentBlank + "delete from " + crudDialogConfig.getTableName()   + " where id = #{id,jdbcType=INTEGER}"+newLine + outSideBlank);
         }
         rootElement.add(select);
     }
@@ -411,7 +429,7 @@ public class MybatisResetCURDAction extends AnAction {
         if (crudDialogConfig.isDeleteFlag()) {
             logicDeleteCode = " and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() ;
         }
-        update.setText("\n"+contentBlank+"update " + crudDialogConfig.getTableName() + " " + setBuilder.toString() + "\n"+contentBlank+"where id = #{id,jdbcType=INTEGER}"+ logicDeleteCode+ "\n "+outSideBlank);
+        update.setText(newLine+contentBlank+"update " + crudDialogConfig.getTableName() + " " + setBuilder.toString() + newLine+contentBlank+"where id = #{id,jdbcType=INTEGER}"+ logicDeleteCode+ newLine+" "+outSideBlank);
         rootElement.add(update);
     }
 
@@ -441,9 +459,9 @@ public class MybatisResetCURDAction extends AnAction {
             trim1.add(_if);
         }
         String trims1 = trim1.asXML().toString();
-        trims1 = trims1.replaceAll("<if", "\n"+contentBlank2+"<if");
-        trims1 = trims1.replaceAll("<trim", "\n"+contentBlank+"<trim");
-        trims1 = trims1.replaceAll("</trim>", "\n"+contentBlank+"</trim>");
+        trims1 = trims1.replaceAll("<if", newLine+contentBlank2+"<if");
+        trims1 = trims1.replaceAll("<trim", newLine+contentBlank+"<trim");
+        trims1 = trims1.replaceAll("</trim>", newLine+contentBlank+"</trim>");
 
         // trim 2
         Element trim2 = new BaseElement("trim");
@@ -460,10 +478,10 @@ public class MybatisResetCURDAction extends AnAction {
             trim2.add(_if);
         }
         String trims2 = trim2.asXML().toString();
-        trims2 = trims2.replaceAll("<if", "\n"+contentBlank2+"<if");
-        trims2 = trims2.replaceAll("<trim", "\n"+contentBlank+"<trim");
-        trims2 = trims2.replaceAll("</trim>", "\n"+contentBlank+"</trim>");
-        insert.setText("\n"+contentBlank+"insert into " + crudDialogConfig.getTableName()  + trims1 + "\n" + trims2+"\n"+outSideBlank);
+        trims2 = trims2.replaceAll("<if", newLine+contentBlank2+"<if");
+        trims2 = trims2.replaceAll("<trim", newLine+contentBlank+"<trim");
+        trims2 = trims2.replaceAll("</trim>", newLine+contentBlank+"</trim>");
+        insert.setText(newLine+contentBlank+"insert into " + crudDialogConfig.getTableName()  + trims1 + newLine + trims2+newLine+outSideBlank);
         rootElement.add(insert);
     }
 
@@ -476,12 +494,12 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = "";//逻辑删除
         if (crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+            logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
         }else {
-            logicDeleteCode=idCloumn+" > -1"+ "\n";
+            logicDeleteCode=idCloumn+" > -1"+ newLine;
         }
         StringBuilder stringBuilder=new StringBuilder();
-        stringBuilder.append("\n").append(contentBlank).append("select * from ").append(crudDialogConfig.getTableName()) .append(" where ") .append(logicDeleteCode);
+        stringBuilder.append(newLine).append(contentBlank).append("select * from ").append(crudDialogConfig.getTableName()) .append(" where ") .append(logicDeleteCode);
         addAllAttributes(attributes,stringBuilder,crudDialogConfig.getDeleteFlagStr());
         select.setText(stringBuilder.toString()+outSideBlank);
         rootElement.add(select);
@@ -496,12 +514,12 @@ public class MybatisResetCURDAction extends AnAction {
         select.addAttribute("resultMap", "BaseResultMap");
         String logicDeleteCode = null;//逻辑删除
         if (crudDialogConfig.isDeleteFlag()) {
-            logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + "\n";
+            logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
         }else {
-            logicDeleteCode=idCloumn+" > -1"+ "\n";
+            logicDeleteCode=idCloumn+" > -1"+ newLine;
         }
         StringBuilder stringBuilder=new StringBuilder();
-        stringBuilder.append("\n").append(contentBlank).append("select count(id) from ").append(crudDialogConfig.getTableName()) .append(" where ") .append(logicDeleteCode);
+        stringBuilder.append(newLine).append(contentBlank).append("select count(id) from ").append(crudDialogConfig.getTableName()) .append(" where ") .append(logicDeleteCode);
         addAllAttributes(attributes,stringBuilder,crudDialogConfig.getDeleteFlagStr());
         select.setText(stringBuilder.toString()+outSideBlank);
         rootElement.add(select);
@@ -518,7 +536,7 @@ public class MybatisResetCURDAction extends AnAction {
             _if.setText("and "+column + " = #{" + property + ",jdbcType=" + jdbcType + "},");
             if(deleteFlagStr!=null&&deleteFlagStr.equals(column)){
             }else {
-                stringBuilder.append(contentBlank).append(_if.asXML().toString()).append("\n");
+                stringBuilder.append(contentBlank).append(_if.asXML().toString()).append(newLine);
             }
         }
     }
@@ -535,19 +553,19 @@ public class MybatisResetCURDAction extends AnAction {
     }
 
     public static void main(String[] arsg) throws FileNotFoundException {
-        FileInputStream fileInputStream=new FileInputStream("D:\\java\\remot\\IdeaEasyPlugin\\test\\ProductMapper_new.xml");
+        FileInputStream fileInputStream=new FileInputStream("H:\\JAVA\\remote\\IdeaEasyPlugin\\test\\UserWithdrawalMapperNew.xml");
         ReaderXML.read(fileInputStream, new ReaderXML.XMLInterface() {
             @Override
             public void update(Document document) {
                 try {
-                    CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig("table",false,false,false,false,false,"delete_flag","0","1");
+                    CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig("tables",true,true,true,true,true,"delete_flag","0","1");
                     crudDialogConfig.setSelectByTextField("name,deadline");
                     crudDialogConfig.setDeleteByTextField("name,deadline");
                     crudDialogConfig.setUpdateByTextField("name,deadline");
                    // removeAllButCloumn(document);
                     runConfigure(document,crudDialogConfig);
 
-                    ReaderXML.writer(document, "D:\\java\\remot\\IdeaEasyPlugin\\test\\ProductMapper_new.xml");
+                    ReaderXML.writer(document, "H:\\JAVA\\remote\\IdeaEasyPlugin\\test\\UserWithdrawalMapperNew.xml");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
