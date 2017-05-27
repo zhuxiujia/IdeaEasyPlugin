@@ -26,6 +26,15 @@ public class CRUDDialog extends JDialog {
     private JProgressBar progressBar;
     private JLabel progressLabel;
     private JButton loadButton;
+    private JTextField textField2;
+    private JTextField textField3;
+    private JCheckBox timeParamCheckBox;
+    private JTextField startTimeTextField;
+    private JTextField endTimeTextField;
+    private JTextField cloumnTextField;
+    private JCheckBox limitIndexParamCheckBox;
+    private JTextField indexTextField;
+    private JTextField sizeTextField;
 
     private void createUIComponents() {
         // TODO: place custom component creation code here

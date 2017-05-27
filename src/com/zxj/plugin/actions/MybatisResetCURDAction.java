@@ -213,7 +213,7 @@ public class MybatisResetCURDAction extends AnAction {
             }
         }
         select.addAttribute("id", nameBuilder.toString());
-        //select.addAttribute("resultMap", "BaseResultMap");
+        select.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
 
         StrBuilder sqlBuilder =new StrBuilder();
         for (int i=0;i<strings.length;i++){
@@ -254,7 +254,7 @@ public class MybatisResetCURDAction extends AnAction {
             }
         }
         select.addAttribute("id", nameBuilder.toString());
-        //select.addAttribute("resultMap", "BaseResultMap");
+        select.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
         String logicDeleteCode = "";
         if (!crudDialogConfig.isDeleteFlag()) {
             logicDeleteCode = newLine+contentBlank+"and " + crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
@@ -423,7 +423,7 @@ public class MybatisResetCURDAction extends AnAction {
         Element update = new BaseElement("update");
         update.addAttribute("id", "updateById");
         update.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-        //update.addAttribute("resultMap", "BaseResultMap");
+        update.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
         StrBuilder setBuilder =createSetBuilder(attributes);
         String logicDeleteCode = "";
         if (crudDialogConfig.isDeleteFlag()) {
@@ -511,7 +511,7 @@ public class MybatisResetCURDAction extends AnAction {
         Element select = new BaseElement("select");
         select.addAttribute("id", "countByCondition");
         //select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-        select.addAttribute("resultMap", "BaseResultMap");
+        select.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
         String logicDeleteCode = null;//逻辑删除
         if (crudDialogConfig.isDeleteFlag()) {
             logicDeleteCode = crudDialogConfig.getDeleteFlagStr() + " = " + crudDialogConfig.getUnDeletedStr() + newLine;
