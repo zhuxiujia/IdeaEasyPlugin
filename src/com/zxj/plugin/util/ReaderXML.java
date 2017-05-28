@@ -3,11 +3,13 @@ package com.zxj.plugin.util;
 import java.io.*;
 
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.SAXWriter;
 import org.dom4j.io.XMLWriter;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,19 +44,25 @@ public class ReaderXML {
      */
     public static void writer(Document document, String fileName) {
         try {
+
+            document =repleaceAllN(document);
+
+            System.out.print(document.asXML().toString());
+
             // 紧凑的格式
              OutputFormat format = OutputFormat.createCompactFormat();
             // 排版缩进的格式
             //OutputFormat format = OutputFormat.createPrettyPrint();
             // 设置编码
             format.setEncoding("UTF-8");
-            format.setTrimText(false);
+            format.setTrimText(true);
             format.setIndent(true); // 设置是否缩进
             format.setIndent("    "); // 以四个空格方式实现缩进
             format.setNewlines(true); // 设置是否换行
-            format.setNewLineAfterDeclaration(false);
+            format.setNewLineAfterDeclaration(true);
+            format.setSuppressDeclaration(true); //是否生产xml头
             format.setNewLineAfterNTags(0);
-            format.setOmitEncoding(true);
+            format.setOmitEncoding(false);
             // 创建XMLWriter对象,指定了写出文件及编码格式
             XMLWriter writer = new XMLWriter(
                     new OutputStreamWriter(new FileOutputStream(new File(fileName)), "UTF-8"),format);
@@ -70,6 +78,30 @@ public class ReaderXML {
             e.printStackTrace();
         }
     }
+
+    private static Document repleaceAllN(Document document) {
+        deleteH(document.getRootElement());
+        return document;
+    }
+
+    private static void deleteH(Element rootElement) {
+        List<Element> elements= rootElement.elements();
+        if(elements.size()!=0)for (Element element:elements){
+            deal(element);
+            if(element.elements().size()!=0)deleteH(element);
+        }
+    }
+
+    private static void deal(Element element) {
+        if(element.elements().size()>0) {
+            //element.setText(element.getText().replaceAll(newLine, ""));
+            String text=element.getText();
+            if(text.startsWith("select")||text.startsWith("update")||text.startsWith("count")||text.startsWith("delete")){
+                element.addEntity("\n","\n");
+            }
+        }
+    }
+
 
     public interface XMLInterface {
         void update(Document document);
