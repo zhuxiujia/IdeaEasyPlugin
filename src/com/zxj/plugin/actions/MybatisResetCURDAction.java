@@ -400,7 +400,7 @@ public class MybatisResetCURDAction extends AnAction {
     private static void addDelete(Element rootElement, CRUDDialogConfig crudDialogConfig) {
         String type = rootElement.element("resultMap").element("id").attribute("jdbcType").getValue();
         Element select =null;
-        if (!crudDialogConfig.isDeleteFlag()) {
+        if (crudDialogConfig.isDeleteFlag()) {
              select = new BaseElement("update");
             select.addAttribute("id", "deleteById");
             select.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));

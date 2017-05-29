@@ -10,4 +10,9 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="delete_flag" property="deleteFlag" jdbcType="INTEGER"/>
     </resultMap>
+    <update id="deleteById" parameterType="java.lang.Integer">
+        update sdaf
+        set delete_flag = 0
+        where id = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>
