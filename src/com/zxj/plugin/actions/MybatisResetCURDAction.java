@@ -542,19 +542,19 @@ public class MybatisResetCURDAction extends AnAction {
     }
 
     public static void main(String[] arsg) throws FileNotFoundException {
-        String file ="/Users/zhuxiujie/Documents/Project/IdeaEasyPlugin/test/UserWithdrawalMapperNew.xml";
+        String file ="D:\\java\\remot\\IdeaEasyPlugin\\test\\UserWithdrawalMapperNew.xml";
         FileInputStream fileInputStream=new FileInputStream(file);
         ReaderXML.read(fileInputStream, new ReaderXML.XMLInterface() {
             @Override
             public void update(Document document) {
                 try {
-                    CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig("tables",true,true,true,true,true,"delete_flag","0","1");
-                    crudDialogConfig.setSelectByCondition(true);
-                    crudDialogConfig.setCountByCondition(true);
+                    CRUDDialogConfig crudDialogConfig=new CRUDDialogConfig("tables",false,false,true,false,false,"delete_flag","0","1");
+                    //crudDialogConfig.setSelectByCondition(true);
+                    //crudDialogConfig.setCountByCondition(true);
 
-                    crudDialogConfig.setSelectByTextField("amount,thirdpayType");
-                    crudDialogConfig.setDeleteByTextField("amount,thirdpayType");
-                    crudDialogConfig.setUpdateByTextField("amount,thirdpayType");
+//                    crudDialogConfig.setSelectByTextField("amount,thirdpayType");
+//                    crudDialogConfig.setDeleteByTextField("amount,thirdpayType");
+//                    crudDialogConfig.setUpdateByTextField("amount,thirdpayType");
                    // removeAllButCloumn(document);
                     runConfigure(document,crudDialogConfig);
 
