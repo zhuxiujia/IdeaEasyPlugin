@@ -27,6 +27,12 @@ public class CRUDDialogConfig {
 
     boolean limitIndexParam=false;
 
+    boolean desc=false;
+
+    boolean orderBy=false;
+
+
+    String orderByValue ="";
 
     String timeSelectText;
 
@@ -220,5 +226,29 @@ public class CRUDDialogConfig {
 
     public String getSizeStr() {
         return sizeStr;
+    }
+
+    public void setDesc(boolean desc) {
+        this.desc = desc;
+    }
+
+    public boolean isDesc() {
+        return desc;
+    }
+
+    public void setOrderByValue(String orderByValue) {
+        this.orderByValue = orderByValue;
+    }
+
+    public String getOrderByValue() {
+        return orderByValue;
+    }
+
+    public void setOrderBy(boolean orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public boolean isOrderBy() {
+        return orderBy;
     }
 }

@@ -40,6 +40,9 @@ public class CRUDDialog extends JDialog {
 
     private JTextField sizeTextField;
     private JCheckBox limitIndexParamCheckBox;
+    private JCheckBox orderByCheckBox;
+    private JTextField orderByTextField;
+    private JCheckBox descCheckBox;
 
 
     private void createUIComponents() {
@@ -124,6 +127,9 @@ public class CRUDDialog extends JDialog {
         crudDialogConfig.setLimitIndexParam(limitIndexParamCheckBox.isSelected());
         crudDialogConfig.setLimitIndexParam(indexTextField.getText().toString(),sizeTextField.getText().toString());
 
+        crudDialogConfig.setDesc(descCheckBox.isSelected());
+        crudDialogConfig.setOrderByValue(orderByTextField.getText().toString());
+        crudDialogConfig.setOrderBy(orderByCheckBox.isSelected());
 
         resulet.result(crudDialogConfig);
     }

@@ -499,6 +499,8 @@ public class MybatisResetCURDAction extends AnAction {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(newLine).append(contentBlank).append("select * from ").append(crudDialogConfig.getTableName()).append(" where ").append(logicDeleteCode);
         addIfHaveTime(rootElement, select, crudDialogConfig);
+        addOrderBy(select,crudDialogConfig);
+        addDesc(select,crudDialogConfig);
         addSizeLimit(rootElement, select, crudDialogConfig);
 
         String[] strings=addStartAndEnd(crudDialogConfig.getSelectByCloumnTextField().split(","),crudDialogConfig);
@@ -506,6 +508,18 @@ public class MybatisResetCURDAction extends AnAction {
         String returnObj = findBaseResultMap(rootElement, crudDialogConfig.getBaseResultMap()).attributeValue("type");
         rootElement.addComment("build by plugin: " + returnObj + " selectByCondition(" + paramBuilder.toString() + ");");
         rootElement.add(select);
+    }
+
+    private static void addDesc(Element select, CRUDDialogConfig crudDialogConfig) {
+        if(crudDialogConfig.isDesc()){
+            select.addText(" desc");
+        }
+    }
+
+    private static void addOrderBy(Element select, CRUDDialogConfig crudDialogConfig) {
+        if(crudDialogConfig.isOrderBy()){
+            select.addText("order by "+crudDialogConfig.getOrderByValue());
+        }
     }
 
     private static String[] addStartAndEnd(String[] split,CRUDDialogConfig crudDialogConfig) {
