@@ -26,15 +26,21 @@ public class CRUDDialog extends JDialog {
     private JProgressBar progressBar;
     private JLabel progressLabel;
     private JButton loadButton;
-    private JTextField textField2;
-    private JTextField textField3;
-    private JCheckBox timeParamCheckBox;
-    private JTextField startTimeTextField;
-    private JTextField endTimeTextField;
-    private JTextField cloumnTextField;
-    private JCheckBox limitIndexParamCheckBox;
+    private JTextField selectByCloumnTextField;
+    private JTextField countByCloumnTextField;
+    private JCheckBox timeSelectCheckBox;
+    private JTextField timeTextField;
+    private JTextField baseResultMapTextField;
+    private JCheckBox selectByCheckBox;
+    private JCheckBox updateByCheckBox;
+    private JCheckBox deleteByCheckBox;
+
+
     private JTextField indexTextField;
+
     private JTextField sizeTextField;
+    private JCheckBox limitIndexParamCheckBox;
+
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
@@ -100,6 +106,25 @@ public class CRUDDialog extends JDialog {
         crudDialogConfig.setUpdateByTextField(updateByTextField.getText().toString());
         crudDialogConfig.setDeleteByTextField(deleteByTextField.getText().toString());
 
+        crudDialogConfig.setSelectByCloumnTextField(selectByCloumnTextField.getText().toString());
+        crudDialogConfig.setCountByCloumnTextField(countByCloumnTextField.getText().toString());
+
+
+        crudDialogConfig.setTimeSelectText(timeTextField.getText().toString());
+
+        crudDialogConfig.setTimeSelect(timeSelectCheckBox.isSelected());
+
+        crudDialogConfig.setBaseResultMap(baseResultMapTextField.getText());
+
+
+        crudDialogConfig.setSelectBy(selectByCheckBox.isSelected());
+        crudDialogConfig.setUpdateBy(selectByCheckBox.isSelected());
+        crudDialogConfig.setDeleteBy(selectByCheckBox.isSelected());
+
+        crudDialogConfig.setLimitIndexParam(limitIndexParamCheckBox.isSelected());
+        crudDialogConfig.setLimitIndexParam(indexTextField.getText().toString(),sizeTextField.getText().toString());
+
+
         resulet.result(crudDialogConfig);
     }
 
@@ -144,5 +169,29 @@ public class CRUDDialog extends JDialog {
 
     public JLabel getProgressLabel() {
         return progressLabel;
+    }
+
+    public JTextField getSelectByCloumnTextField() {
+        return selectByCloumnTextField;
+    }
+
+    public JTextField getCountByCloumnTextField() {
+        return countByCloumnTextField;
+    }
+
+    public JTextField getBaseResultMapTextField() {
+        return baseResultMapTextField;
+    }
+
+    public JCheckBox getSelectByCheckBox() {
+        return selectByCheckBox;
+    }
+
+    public JCheckBox getUpdateByCheckBox() {
+        return updateByCheckBox;
+    }
+
+    public JCheckBox getDeleteByCheckBox() {
+        return deleteByCheckBox;
     }
 }

@@ -1,7 +1,5 @@
 package com.zxj.plugin.config;
 
-import org.apache.commons.lang.text.StrBuilder;
-
 /**
  * @author zhuxiujie
  * @since 2017/4/11
@@ -9,23 +7,46 @@ import org.apache.commons.lang.text.StrBuilder;
 
 public class CRUDDialogConfig {
     String  tableName;
-    boolean select;
-    boolean delete;
-    boolean update;
-    boolean create;
-    boolean deleteFlag;
+    boolean select=false;
+    boolean delete=false;
+    boolean update=false;
+    boolean create=false;
+    boolean deleteFlag=false;
 
-    boolean selectByCondition;
-    boolean countByCondition;
+    boolean selectByCondition=false;
+    boolean countByCondition=false;
+
+    boolean timeSelect=false;
+
+
+    boolean selectBy=false;
+
+    boolean updateBy=false;
+
+    boolean deleteBy=false;
+
+    boolean limitIndexParam=false;
+
+
+    String timeSelectText;
 
     String deleteFlagStr;
     String deletedStr;
     String unDeletedStr;
 
 
-    String  selectByTextField;
+    String selectByCloumnTextField;
+    String countByCloumnTextField;
+
+
+    String selectByTextField;
     String updateByTextField;
     String deleteByTextField;
+
+    String baseResultMap="BaseResultMap";
+
+    String indexStr="";
+    String sizeStr="";
 
     public CRUDDialogConfig(String tableName,boolean select,boolean delete,boolean update,boolean create,boolean deleteFlag,String deleteFlagStr,String deletedStr,String unDeletedStr){
         this.select=select;
@@ -114,5 +135,90 @@ public class CRUDDialogConfig {
 
     public String getUpdateByTextField() {
         return updateByTextField;
+    }
+
+    public void setTimeSelect(boolean timeSelect) {
+        this.timeSelect = timeSelect;
+    }
+
+    public boolean isTimeSelect() {
+        return timeSelect;
+    }
+
+    public void setTimeSelectText(String timeSelectText) {
+        this.timeSelectText = timeSelectText;
+    }
+
+    public String getTimeSelectText() {
+        return timeSelectText;
+    }
+
+    public void setBaseResultMap(String baseResultMap) {
+        this.baseResultMap = baseResultMap;
+    }
+
+    public String getBaseResultMap() {
+        return baseResultMap;
+    }
+
+    public void setSelectByCloumnTextField(String selectByCloumnTextField) {
+        this.selectByCloumnTextField = selectByCloumnTextField;
+    }
+
+    public String getSelectByCloumnTextField() {
+        return selectByCloumnTextField;
+    }
+
+    public void setCountByCloumnTextField(String countByCloumnTextField) {
+        this.countByCloumnTextField = countByCloumnTextField;
+    }
+
+    public String getCountByCloumnTextField() {
+        return countByCloumnTextField;
+    }
+
+    public boolean isSelectBy() {
+        return selectBy;
+    }
+
+    public void setSelectBy(boolean selectBy) {
+        this.selectBy = selectBy;
+    }
+
+    public boolean isUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(boolean updateBy) {
+        this.updateBy = updateBy;
+    }
+
+    public boolean isDeleteBy() {
+        return deleteBy;
+    }
+
+    public void setDeleteBy(boolean deleteBy) {
+        this.deleteBy = deleteBy;
+    }
+
+    public void setLimitIndexParam(boolean limitIndexParam) {
+        this.limitIndexParam = limitIndexParam;
+    }
+
+    public boolean isLimitIndexParam() {
+        return limitIndexParam;
+    }
+
+    public void setLimitIndexParam(String index, String size) {
+        this.indexStr =index;
+        this.sizeStr =size;
+    }
+
+    public String getIndexStr() {
+        return indexStr;
+    }
+
+    public String getSizeStr() {
+        return sizeStr;
     }
 }
