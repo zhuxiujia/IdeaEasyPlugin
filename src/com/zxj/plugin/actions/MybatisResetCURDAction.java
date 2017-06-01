@@ -496,8 +496,9 @@ public class MybatisResetCURDAction extends AnAction {
             logicDeleteCode = idCloumn + " > -1" + newLine;
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(newLine).append(contentBlank).append("select * from ").append(crudDialogConfig.getTableName()).append(" where ").append(logicDeleteCode);
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append(newLine).append(contentBlank).append("select * from ").append(crudDialogConfig.getTableName()).append(" where ").append(logicDeleteCode);
+        select.addText(sqlBuilder.toString());
         addIfHaveTime(rootElement, select, crudDialogConfig);
         addOrderBy(select,crudDialogConfig);
         addDesc(select,crudDialogConfig);
@@ -564,8 +565,9 @@ public class MybatisResetCURDAction extends AnAction {
         } else {
             logicDeleteCode = idCloumn + " > -1" + newLine;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(newLine).append(contentBlank).append("select count(id) from ").append(crudDialogConfig.getTableName()).append(" where ").append(logicDeleteCode);
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append(newLine).append(contentBlank).append("select count(id) from ").append(crudDialogConfig.getTableName()).append(" where ").append(logicDeleteCode);
+        select.addText(sqlBuilder.toString());
         addIfHaveTime(rootElement, select, crudDialogConfig);
 
         String[] strings=addStartAndEnd(crudDialogConfig.getSelectByCloumnTextField().split(","),crudDialogConfig);
@@ -605,7 +607,7 @@ public class MybatisResetCURDAction extends AnAction {
         String jdbcType = element.attributeValue("jdbcType");
         String property = element.attributeValue("property");
         _if.addAttribute("test", property + " != null");
-        _if.setText("and " + column + " = #{" + property + ",jdbcType=" + jdbcType + "},");
+        _if.setText("and " + column + " = #{" + property + ",jdbcType=" + jdbcType + "}");
         if (deleteFlagStr != null && deleteFlagStr.equals(column)) {
         } else {
             target.add(_if);
@@ -618,7 +620,7 @@ public class MybatisResetCURDAction extends AnAction {
         String jdbcType = data.attributeValue("jdbcType");
         String property = data.attributeValue("property");
         _if.addAttribute("test", property + "Start != null");
-        _if.setText("and " + column + " >= #{" + property + "Start,jdbcType=" + jdbcType + "},");
+        _if.setText("and " + column + " >= #{" + property + "Start,jdbcType=" + jdbcType + "}");
         if (deleteFlagStr != null && deleteFlagStr.equals(column)) {
         } else {
             target.add(_if);
@@ -631,7 +633,7 @@ public class MybatisResetCURDAction extends AnAction {
         String jdbcType = data.attributeValue("jdbcType");
         String property = data.attributeValue("property");
         _if.addAttribute("test", property + "End != null");
-        _if.setText("and " + column + " &lt;= #{" + property + "End,jdbcType=" + jdbcType + "},");
+        _if.setText("and " + column + " &lt;= #{" + property + "End,jdbcType=" + jdbcType + "}");
         if (deleteFlagStr != null && deleteFlagStr.equals(column)) {
         } else {
             element.add(_if);
