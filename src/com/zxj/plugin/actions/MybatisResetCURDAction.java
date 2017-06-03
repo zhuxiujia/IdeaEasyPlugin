@@ -424,7 +424,7 @@ public class MybatisResetCURDAction extends AnAction {
         Element update = new BaseElement("update");
         update.addAttribute("id", "updateById");
         update.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-        update.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
+       // update.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
         Element setBuilder = createSetBuilder2(attributes);
         String logicDeleteCode = "";
         if (crudDialogConfig.isDeleteFlag()) {
