@@ -332,12 +332,18 @@ public class MybatisResetCURDAction extends AnAction {
                 paramBuilder.append("@Param(\"").append(addValue).append("\")");
                 paramBuilder.append(JDBC2JAVA.getJAVAValueShort(getJdbcTypeByProperty(attributes, relaValue)) + " " + addValue + "");
             } else {
-                paramBuilder.append(",\n");
-                paramBuilder.append(outSideBlank);
-                paramBuilder.append("@Param(\"").append(addValue).append("\")");
-                paramBuilder.append(JDBC2JAVA.getJAVAValueShort(getJdbcTypeByProperty(attributes, relaValue)) + " " + addValue + "");
+                String type=JDBC2JAVA.getJAVAValueShort(getJdbcTypeByProperty(attributes, relaValue));
+                appendValue(paramBuilder,addValue,type);
             }
         }
+        return paramBuilder;
+    }
+
+    private static StringBuilder appendValue(StringBuilder paramBuilder,String addValue, String type ){
+        paramBuilder.append(",\n");
+        paramBuilder.append(outSideBlank);
+        paramBuilder.append("@Param(\"").append(addValue).append("\")");
+        paramBuilder.append( type+ " " + addValue + "");
         return paramBuilder;
     }
 
@@ -507,7 +513,12 @@ public class MybatisResetCURDAction extends AnAction {
         String[] strings=addStartAndEnd(crudDialogConfig.getSelectByCloumnTextField().split(","),crudDialogConfig);
         StringBuilder paramBuilder = createParamBuilder(strings, rootElement, crudDialogConfig);
         String returnObj = findBaseResultMap(rootElement, crudDialogConfig.getBaseResultMap()).attributeValue("type");
-        rootElement.addComment("build by plugin: " + returnObj + " selectByCondition(" + paramBuilder.toString() + ");");
+
+        if(crudDialogConfig.isLimitIndexParam()) {
+            appendValue(paramBuilder,crudDialogConfig.getIndexStr(), "Integer");
+            appendValue(paramBuilder, crudDialogConfig.getSizeStr(), "Integer");
+        }
+        rootElement.addComment("build by plugin: List<" + returnObj + "> selectByCondition(" + paramBuilder.toString() + ");");
         rootElement.add(select);
     }
 
