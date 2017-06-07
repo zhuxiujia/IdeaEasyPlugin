@@ -326,24 +326,24 @@ public class MybatisResetCURDAction extends AnAction {
         StringBuilder paramBuilder = new StringBuilder();
         for (int i = 0; i < strings.length; i++) {
 
-            String addValue=strings[i].replace("*","");
-            String relaValue =strings[i].replace("*Start","").replace("*End","");
+            String addValue = strings[i].replace("*", "");
+            String relaValue = strings[i].replace("*Start", "").replace("*End", "");
             if (i == 0) {
                 paramBuilder.append("@Param(\"").append(addValue).append("\")");
                 paramBuilder.append(JDBC2JAVA.getJAVAValueShort(getJdbcTypeByProperty(attributes, relaValue)) + " " + addValue + "");
             } else {
-                String type=JDBC2JAVA.getJAVAValueShort(getJdbcTypeByProperty(attributes, relaValue));
-                appendValue(paramBuilder,addValue,type);
+                String type = JDBC2JAVA.getJAVAValueShort(getJdbcTypeByProperty(attributes, relaValue));
+                appendValue(paramBuilder, addValue, type);
             }
         }
         return paramBuilder;
     }
 
-    private static StringBuilder appendValue(StringBuilder paramBuilder,String addValue, String type ){
+    private static StringBuilder appendValue(StringBuilder paramBuilder, String addValue, String type) {
         paramBuilder.append(",\n");
         paramBuilder.append(outSideBlank);
         paramBuilder.append("@Param(\"").append(addValue).append("\")");
-        paramBuilder.append( type+ " " + addValue + "");
+        paramBuilder.append(type + " " + addValue + "");
         return paramBuilder;
     }
 
@@ -430,7 +430,7 @@ public class MybatisResetCURDAction extends AnAction {
         Element update = new BaseElement("update");
         update.addAttribute("id", "updateById");
         update.addAttribute("parameterType", JDBC2JAVA.getJAVAValue(type));
-       // update.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
+        // update.addAttribute("resultType", JDBC2JAVA.getJAVAValue("INTEGER"));
         Element setBuilder = createSetBuilder2(attributes);
         String logicDeleteCode = "";
         if (crudDialogConfig.isDeleteFlag()) {
@@ -506,16 +506,16 @@ public class MybatisResetCURDAction extends AnAction {
         sqlBuilder.append(newLine).append(contentBlank).append("select * from ").append(crudDialogConfig.getTableName()).append(" where ").append(logicDeleteCode);
         select.addText(sqlBuilder.toString());
         addIfHaveTime(rootElement, select, crudDialogConfig);
-        addOrderBy(select,crudDialogConfig);
-        addDesc(select,crudDialogConfig);
+        addOrderBy(select, crudDialogConfig);
+        addDesc(select, crudDialogConfig);
         addSizeLimit(rootElement, select, crudDialogConfig);
 
-        String[] strings=addStartAndEnd(crudDialogConfig.getSelectByCloumnTextField().split(","),crudDialogConfig);
+        String[] strings = addStartAndEnd(crudDialogConfig.getSelectByCloumnTextField().split(","), crudDialogConfig);
         StringBuilder paramBuilder = createParamBuilder(strings, rootElement, crudDialogConfig);
         String returnObj = findBaseResultMap(rootElement, crudDialogConfig.getBaseResultMap()).attributeValue("type");
 
-        if(crudDialogConfig.isLimitIndexParam()) {
-            appendValue(paramBuilder,crudDialogConfig.getIndexStr(), "Integer");
+        if (crudDialogConfig.isLimitIndexParam()) {
+            appendValue(paramBuilder, crudDialogConfig.getIndexStr(), "Integer");
             appendValue(paramBuilder, crudDialogConfig.getSizeStr(), "Integer");
         }
         rootElement.addComment("build by plugin: List<" + returnObj + "> selectByCondition(" + paramBuilder.toString() + ");");
@@ -523,33 +523,33 @@ public class MybatisResetCURDAction extends AnAction {
     }
 
     private static void addDesc(Element select, CRUDDialogConfig crudDialogConfig) {
-        if(crudDialogConfig.isDesc()){
+        if (crudDialogConfig.isDesc()) {
             select.addText(" desc");
         }
     }
 
     private static void addOrderBy(Element select, CRUDDialogConfig crudDialogConfig) {
-        if(crudDialogConfig.isOrderBy()){
-            select.addText("order by "+crudDialogConfig.getOrderByValue());
+        if (crudDialogConfig.isOrderBy()) {
+            select.addText("order by " + crudDialogConfig.getOrderByValue());
         }
     }
 
-    private static String[] addStartAndEnd(String[] split,CRUDDialogConfig crudDialogConfig) {
-        if(split==null)return new String[0];
-        List<String> strings=new ArrayList<String>();
-        for (String string:split){
-            if(string.endsWith(crudDialogConfig.getTimeSelectText().replace("*", ""))){
-                strings.add(string+"*Start");
-                strings.add(string+"*End");
-            }else {
+    private static String[] addStartAndEnd(String[] split, CRUDDialogConfig crudDialogConfig) {
+        if (split == null) return new String[0];
+        List<String> strings = new ArrayList<String>();
+        for (String string : split) {
+            if (string.endsWith(crudDialogConfig.getTimeSelectText().replace("*", ""))) {
+                strings.add(string + "*Start");
+                strings.add(string + "*End");
+            } else {
                 strings.add(string);
             }
         }
-        String[] args=new String[strings.size()];
-        for (int i=0;i<strings.size();i++){
-            args[i]=strings.get(i);
+        String[] args = new String[strings.size()];
+        for (int i = 0; i < strings.size(); i++) {
+            args[i] = strings.get(i);
         }
-        return  args;
+        return args;
     }
 
     private static Element findBaseResultMap(Element rootElement, String findMapStr) {
@@ -581,7 +581,7 @@ public class MybatisResetCURDAction extends AnAction {
         select.addText(sqlBuilder.toString());
         addIfHaveTime(rootElement, select, crudDialogConfig);
 
-        String[] strings=addStartAndEnd(crudDialogConfig.getSelectByCloumnTextField().split(","),crudDialogConfig);
+        String[] strings = addStartAndEnd(crudDialogConfig.getSelectByCloumnTextField().split(","), crudDialogConfig);
         StringBuilder paramBuilder = createParamBuilder(strings, rootElement, crudDialogConfig);
         rootElement.addComment("build by plugin: int countByCondition(" + paramBuilder.toString() + ");");
         rootElement.add(select);
