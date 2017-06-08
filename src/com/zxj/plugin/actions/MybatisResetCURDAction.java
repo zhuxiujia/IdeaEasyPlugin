@@ -537,9 +537,8 @@ public class MybatisResetCURDAction extends AnAction {
     private static String[] addStartAndEnd(String[] split, CRUDDialogConfig crudDialogConfig) {
         if (split == null) return new String[0];
         List<String> strings = new ArrayList<String>();
-        String[] endStrings=crudDialogConfig.getTimeSelectText().split(",");
         for (String string : split) {
-            if (endsWith(string,endStrings,"*")) {
+            if (endsWith(string,crudDialogConfig,"*")) {
                 strings.add(string + "*Start");
                 strings.add(string + "*End");
             } else {
@@ -554,7 +553,9 @@ public class MybatisResetCURDAction extends AnAction {
         return args;
     }
 
-    private static boolean endsWith(String form, String[] endStrings,String repleaceEndStr) {
+    private static boolean endsWith(String form, CRUDDialogConfig crudDialogConfig,String repleaceEndStr) {
+        if(crudDialogConfig.getTimeSelectText()==null)return false;
+        String[] endStrings=crudDialogConfig.getTimeSelectText().split(",");
         if(endStrings==null)return false;
         for (String endStr:endStrings){
             if(form.endsWith(endStr.replace(repleaceEndStr,""))){
@@ -614,7 +615,7 @@ public class MybatisResetCURDAction extends AnAction {
         List<Element> attributes = findBaseResultMap(root, crudDialogConfig.getBaseResultMap()).elements("result");
         for (Element element : attributes) {
             String property = element.attributeValue("property");
-            if (crudDialogConfig.isTimeSelect() && crudDialogConfig.getTimeSelectText() != null && property.endsWith(crudDialogConfig.getTimeSelectText().replace("*", ""))) {
+            if (crudDialogConfig.isTimeSelect() && crudDialogConfig.getTimeSelectText() != null && endsWith(property,crudDialogConfig,"*")) {
                 addIfMore(element, target, crudDialogConfig.getDeleteFlagStr());
                 addIfLess(element, target, crudDialogConfig.getDeleteFlagStr());
             } else {
