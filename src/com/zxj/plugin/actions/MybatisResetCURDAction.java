@@ -537,19 +537,31 @@ public class MybatisResetCURDAction extends AnAction {
     private static String[] addStartAndEnd(String[] split, CRUDDialogConfig crudDialogConfig) {
         if (split == null) return new String[0];
         List<String> strings = new ArrayList<String>();
+        String[] endStrings=crudDialogConfig.getTimeSelectText().split(",");
         for (String string : split) {
-            if (string.endsWith(crudDialogConfig.getTimeSelectText().replace("*", ""))) {
+            if (endsWith(string,endStrings,"*")) {
                 strings.add(string + "*Start");
                 strings.add(string + "*End");
             } else {
                 strings.add(string);
             }
+
         }
         String[] args = new String[strings.size()];
         for (int i = 0; i < strings.size(); i++) {
             args[i] = strings.get(i);
         }
         return args;
+    }
+
+    private static boolean endsWith(String form, String[] endStrings,String repleaceEndStr) {
+        if(endStrings==null)return false;
+        for (String endStr:endStrings){
+            if(form.endsWith(endStr.replace(repleaceEndStr,""))){
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Element findBaseResultMap(Element rootElement, String findMapStr) {

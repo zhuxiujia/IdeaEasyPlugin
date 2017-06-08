@@ -312,7 +312,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value="*Time"/>
+              <text value="*Time,*Date"/>
             </properties>
           </component>
           <component id="356bc" class="javax.swing.JLabel">
