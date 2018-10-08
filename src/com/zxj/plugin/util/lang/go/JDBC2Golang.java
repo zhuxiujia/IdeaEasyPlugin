@@ -1,7 +1,5 @@
 package com.zxj.plugin.util.lang.go;
 
-import com.intellij.openapi.util.text.StringUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,41 +73,49 @@ public class JDBC2Golang {
             } else if (jdbcTYPE.equals("INTEGER") ||
                     jdbcTYPE.equals("SMALLINT")) {
                 return "strconv.Itoa(" + keyName + ")";
-            }else if (jdbcTYPE.equals("DOUBLE") ||
-                    jdbcTYPE.equals("FLOAT")||
+            } else if (jdbcTYPE.equals("DOUBLE") ||
+                    jdbcTYPE.equals("FLOAT") ||
                     jdbcTYPE.equals("REAL")) {
-                return "strconv.FormatFloat("+keyName+", 'f', 8, 64)";
-            }else {
+                return "strconv.FormatFloat(" + keyName + ", 'f', 8, 64)";
+            } else {
                 return keyName;
             }
-        }else {
+        } else {
             return keyName;
         }
     }
-    public static String convertIsNullString(String jdbcTYPE, String keyName) {
+
+    public static String convertIfNullString(String jdbcTYPE, String keyName, boolean ifIsZero) {
+        String equalString = " == ";
+        String isZeroString = "";
+        if (ifIsZero == false) {
+            equalString = " != ";
+            isZeroString = "!";
+        }
+
         if (jdbcTYPE != null && jdbcTYPE.equals("") == false) {
             if (jdbcTYPE.equalsIgnoreCase("CHAR") ||
                     jdbcTYPE.equalsIgnoreCase("CLOB") ||
                     jdbcTYPE.equalsIgnoreCase("LONGVARCHAR") ||
                     jdbcTYPE.equalsIgnoreCase("VARCHAR")) {
-                return keyName+" == ``";
+                return keyName + equalString + "``";
             } else if (jdbcTYPE.equals("TIMESTAMP") ||
                     jdbcTYPE.equals("TIME")) {
-                return keyName + ".IsZero()";
+                return isZeroString + keyName + ".IsZero()";
             } else if (jdbcTYPE.equals("BIGINT")) {
-                return  keyName + " == 0";
+                return keyName + equalString + "0";
             } else if (jdbcTYPE.equals("INTEGER") ||
                     jdbcTYPE.equals("SMALLINT")) {
-                return  keyName + " == 0";
-            }else if (jdbcTYPE.equals("DOUBLE") ||
-                    jdbcTYPE.equals("FLOAT")||
+                return keyName + equalString + "0";
+            } else if (jdbcTYPE.equals("DOUBLE") ||
+                    jdbcTYPE.equals("FLOAT") ||
                     jdbcTYPE.equals("REAL")) {
-                return keyName+" == 0";
-            }else {
-                return keyName+" == ``";
+                return keyName + equalString + "0";
+            } else {
+                return keyName + equalString + "``";
             }
-        }else {
-            return keyName+" == ``";
+        } else {
+            return keyName + equalString + "``";
         }
     }
 }

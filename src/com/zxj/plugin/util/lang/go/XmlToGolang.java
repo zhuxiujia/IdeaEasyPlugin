@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class XmlToGolang {
 
     public static void main(String[] args) throws Exception {
-        String file = "D:\\JAVA\\IdeaEasyPlugin\\test\\ActivityMapper.xml";
+        String file = "/Users/zhuxiujie/Documents/JAVA/IdeaEasyPlugin/test/ActivityMapper.xml";
         FileInputStream fileInputStream = new FileInputStream(file);
         ReaderXML.read(fileInputStream, new ReaderXML.XMLInterface() {
             @Override
@@ -143,7 +143,12 @@ public class XmlToGolang {
             }
 
             @Override
-            public void GetDefaultElement(DefaultElement element) {
+            public void StartDefaultElement(DefaultElement element) {
+
+            }
+
+            @Override
+            public void EndDefaultElement(DefaultElement element) {
 
             }
         });
@@ -228,11 +233,13 @@ public class XmlToGolang {
                     }
                     raw = raw.replaceAll("\\#\\{" + entry.getKey() + "\\}", "` + " + entry.getKey() + " + `");
                 }
-                if (StringUtil.isNotEmpty(raw)) sql.append("\tsql.WriteString(`").append(raw).append("`)\n");
+                if (StringUtil.isNotEmpty(raw)){
+                    sql.append("\t\tsql.WriteString(`").append(raw).append("`)\n");
+                }
             }
 
             @Override
-            public void GetDefaultElement(DefaultElement element) {
+            public void StartDefaultElement(DefaultElement element) {
                 //decode if element
                 String test = safeAttribute(element, "test");
                 String[] andTests = test.split(" and ");
@@ -245,8 +252,15 @@ public class XmlToGolang {
                         i++;
                         if (i < andTests.length) sql.append(" && ");
                     }
-                    sql.append("\t{\n").append(decodeContent(element, params)).append("\t}\n");
+                    //StringBuilder sb= decodeContent(element.content(), params);
+                    //System.out.println("sb="+sb);
+                    sql.append("\t{\n");
                 }
+            }
+
+            @Override
+            public void EndDefaultElement(DefaultElement element) {
+                sql.append("\t}\n");
             }
 
             private String decodeItemType(String item, Map<String, String> params) {
@@ -256,7 +270,7 @@ public class XmlToGolang {
                 for (String key : keys) {
                     for (Map.Entry<String, String> entry : params.entrySet()) {
                         if (key.equals(entry.getKey())) {
-                            return JDBC2Golang.convertIsNullString(entry.getValue(), key);
+                            return JDBC2Golang.convertIfNullString(entry.getValue(), key,false);
                         }
                     }
                     return item;
@@ -295,8 +309,9 @@ public class XmlToGolang {
                 loopInterface.GetDefaultText((DefaultText) obj);
             } else if (obj.getClass().equals(DefaultElement.class)) {
                 DefaultElement defaultElement = (DefaultElement) obj;
-                loopInterface.GetDefaultElement(defaultElement);
+                loopInterface.StartDefaultElement(defaultElement);
                 loopGetElement(defaultElement, loopInterface);
+                loopInterface.EndDefaultElement(defaultElement);
             }
         }
     }
@@ -304,6 +319,7 @@ public class XmlToGolang {
     interface LoopInterface {
         void GetDefaultText(DefaultText text);
 
-        void GetDefaultElement(DefaultElement element);
+        void StartDefaultElement(DefaultElement element);
+        void EndDefaultElement(DefaultElement element);
     }
 }
