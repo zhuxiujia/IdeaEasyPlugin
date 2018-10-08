@@ -32,4 +32,12 @@ public class StringUtil {
             e.printStackTrace();
         }
     }
+
+    public static StringBuilder deleteLastString(StringBuilder sql, String s) {
+        int last=sql.lastIndexOf(s);
+        if(last==(sql.length()-1)){
+            sql.delete(last,sql.length());
+        }
+        return sql;
+    }
 }
