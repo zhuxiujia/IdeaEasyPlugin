@@ -105,52 +105,43 @@ public class XmlToGolang {
             }
             Map<String, String> params = new HashMap<>();
             scanAllParams(element, params);
-            List<Object> contents = element.content();
-            String func = createSelectFunc(id, basicXmlInfo.getNamespace(), params, returnType, collection, contents);
+            String func = createSelectFunc(id, basicXmlInfo.getNamespace(), params, returnType, collection, element);
             System.out.println(func);
         }
     }
 
     private static void scanAllParams(Element element, Map<String, String> params) {
         Pattern pattern = Pattern.compile(regEx);
-       loopGetElement(element, object -> {
-           Matcher matcher = pattern.matcher(object.getText());
-           while (matcher.find()) {
-               String group = matcher.group().replaceAll(" ", "");
-               String groupContext = group.replace("#{", "").replace("}", "");
-               String[] args = groupContext.split(",");
-               if (args.length > 0 && args.length <= 1) {
-                   params.put(args[0], "");
-               } else {
-                   String jdbcType = args[1].replace("jdbcType=", "");
-                   params.put(args[0], jdbcType);
-               }
-           }
-       });
-
-    }
-
-    private static void loopGetElement(Element element,LoopInterface loopInterface){
-        for (Object obj : element.content()) {
-            if (obj.getClass().equals(DefaultText.class)) {
-                loopInterface.GetElement((DefaultText)obj);
-            }else if(obj.getClass().equals(DefaultElement.class)){
-                DefaultElement defaultElement=(DefaultElement)obj;
-                loopGetElement(defaultElement,loopInterface);
+        loopGetElement(element, new LoopInterface() {
+            @Override
+            public void GetDefaultText(DefaultText text) {
+                Matcher matcher = pattern.matcher(text.getText());
+                while (matcher.find()) {
+                    String group = matcher.group().replaceAll(" ", "");
+                    String groupContext = group.replace("#{", "").replace("}", "");
+                    String[] args = groupContext.split(",");
+                    if (args.length > 0 && args.length <= 1) {
+                        params.put(args[0], "");
+                    } else {
+                        String jdbcType = args[1].replace("jdbcType=", "");
+                        params.put(args[0], jdbcType);
+                    }
+                }
             }
-        }
+
+            @Override
+            public void GetDefaultElement(DefaultElement element) {
+
+            }
+        });
+
     }
 
-    interface LoopInterface {
-       void GetElement(DefaultText object);
-    }
-
-
-    private static String createSelectFunc(String id, String mapperName, Map<String, String> params, String returnType, String collection, List<Object> contents) {
+    private static String createSelectFunc(String id, String mapperName, Map<String, String> params, String returnType, String collection, Element contents) {
         StringBuilder stringBuilder = new StringBuilder();
         //create func title
         stringBuilder.append("func (this ").append(mapperName).append(")").append(id).append("(");
-        int i=0;
+        int i = 0;
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String type = "string";
             String jdbcType = entry.getValue();
@@ -159,7 +150,7 @@ public class XmlToGolang {
             }
             stringBuilder.append(entry.getKey()).append(" ").append(type);
             i++;
-            if(i!=params.size()){
+            if (i != params.size()) {
                 stringBuilder.append(",");
             }
         }
@@ -191,23 +182,25 @@ public class XmlToGolang {
         return stringBuilder.toString();
     }
 
-    private static StringBuilder decodeContent(List<Object> contents, Map<String, String> params) {
-        StringBuilder sql = new StringBuilder();
-        for (Object obj : contents) {
-            if (obj.getClass().equals(DefaultText.class)) {
+    private static StringBuilder decodeContent(Element element, Map<String, String> params) {
+        final StringBuilder sql = new StringBuilder();
+        loopGetElement(element, new LoopInterface() {
+            @Override
+            public void GetDefaultText(DefaultText text) {
                 //text
-                DefaultText text = (DefaultText) obj;
                 String raw = text.getText().replaceAll("\n", "").replaceAll("  ", "");
 
                 for (Map.Entry<String, String> entry : params.entrySet()) {
-                    raw = raw.replaceAll("&lt;","<");
+                    raw = raw.replaceAll("&lt;", "<");
                     raw = raw.replaceAll("\\#\\{" + entry.getKey() + "\\}", "` + " + entry.getKey() + " + `");
                     raw = raw.replaceAll("\\#\\{" + entry.getKey() + ",jdbcType=" + entry.getValue() + "\\}", "` + " + entry.getKey() + " + `");
                 }
                 if (StringUtil.isNotEmpty(raw)) sql.append("\tsql.WriteString(`").append(raw).append("`)\n");
-            } else if (obj.getClass().equals(DefaultElement.class)) {
-                //if
-                DefaultElement element = (DefaultElement) obj;
+            }
+
+            @Override
+            public void GetDefaultElement(DefaultElement element) {
+                //decode if element
                 String test = safeAttribute(element, "test");
                 String[] andTests = test.split(" and ");
                 if (andTests.length != 0) {
@@ -218,11 +211,10 @@ public class XmlToGolang {
                         i++;
                         if (i < andTests.length) sql.append(" && ");
                     }
-                    sql.append("\t{\n").append(decodeContent(element.content(), params)).append("\n\t}\n");
+                    sql.append("\t{\n").append(decodeContent(element, params)).append("\n\t}\n");
                 }
             }
-        }
-        sql = com.zxj.plugin.util.StringUtil.deleteLastString(sql, "+");
+        });
         return sql;
     }
 
@@ -233,5 +225,23 @@ public class XmlToGolang {
             return null;
         }
         return a.getValue();
+    }
+
+    private static void loopGetElement(Element element, LoopInterface loopInterface) {
+        for (Object obj : element.content()) {
+            if (obj.getClass().equals(DefaultText.class)) {
+                loopInterface.GetDefaultText((DefaultText) obj);
+            } else if (obj.getClass().equals(DefaultElement.class)) {
+                DefaultElement defaultElement = (DefaultElement) obj;
+                loopInterface.GetDefaultElement(defaultElement);
+                loopGetElement(defaultElement, loopInterface);
+            }
+        }
+    }
+
+    interface LoopInterface {
+        void GetDefaultText(DefaultText text);
+
+        void GetDefaultElement(DefaultElement element);
     }
 }
