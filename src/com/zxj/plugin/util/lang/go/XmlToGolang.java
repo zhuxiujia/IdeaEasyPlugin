@@ -17,7 +17,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class XmlToGolang {
-   static final String regEx = "#\\{([^\\}]+)\\}";
+    static final String regEx = "#\\{([^\\}]+)\\}";
+
     public static void main(String[] args) throws Exception {
         String file = "D:\\JAVA\\IdeaEasyPlugin\\test\\ActivityMapper.xml";
         FileInputStream fileInputStream = new FileInputStream(file);
@@ -103,32 +104,53 @@ public class XmlToGolang {
                 }
             }
             Map<String, String> params = new HashMap<>();
-            scanAllParams(element.getText(), params);
+            scanAllParams(element, params);
             List<Object> contents = element.content();
             String func = createSelectFunc(id, basicXmlInfo.getNamespace(), params, returnType, collection, contents);
             System.out.println(func);
         }
     }
 
-    private static void scanAllParams(String text, Map<String, String> params) {
+    private static void scanAllParams(Element element, Map<String, String> params) {
         Pattern pattern = Pattern.compile(regEx);
-        Matcher matcher = pattern.matcher(text);
-        while (matcher.find()) {
-            String group = matcher.group().replaceAll(" ", "");
-            String groupContext = group.replace("#{", "").replace("}", "");
-            String[] args = groupContext.split(",");
-            if (args.length > 0 && args.length <= 1) {
-                params.put(args[0], "");
-            } else {
-                String jdbcType = args[1].replace("jdbcType=", "");
-                params.put(args[0], jdbcType);
+       loopGetElement(element, object -> {
+           Matcher matcher = pattern.matcher(object.getText());
+           while (matcher.find()) {
+               String group = matcher.group().replaceAll(" ", "");
+               String groupContext = group.replace("#{", "").replace("}", "");
+               String[] args = groupContext.split(",");
+               if (args.length > 0 && args.length <= 1) {
+                   params.put(args[0], "");
+               } else {
+                   String jdbcType = args[1].replace("jdbcType=", "");
+                   params.put(args[0], jdbcType);
+               }
+           }
+       });
+
+    }
+
+    private static void loopGetElement(Element element,LoopInterface loopInterface){
+        for (Object obj : element.content()) {
+            if (obj.getClass().equals(DefaultText.class)) {
+                loopInterface.GetElement((DefaultText)obj);
+            }else if(obj.getClass().equals(DefaultElement.class)){
+                DefaultElement defaultElement=(DefaultElement)obj;
+                loopGetElement(defaultElement,loopInterface);
             }
         }
     }
 
+    interface LoopInterface {
+       void GetElement(DefaultText object);
+    }
+
+
     private static String createSelectFunc(String id, String mapperName, Map<String, String> params, String returnType, String collection, List<Object> contents) {
         StringBuilder stringBuilder = new StringBuilder();
+        //create func title
         stringBuilder.append("func (this ").append(mapperName).append(")").append(id).append("(");
+        int i=0;
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String type = "string";
             String jdbcType = entry.getValue();
@@ -136,6 +158,10 @@ public class XmlToGolang {
                 type = JDBC2Golang.getGolangValue(jdbcType);
             }
             stringBuilder.append(entry.getKey()).append(" ").append(type);
+            i++;
+            if(i!=params.size()){
+                stringBuilder.append(",");
+            }
         }
         stringBuilder.append(") (");
 
@@ -153,9 +179,11 @@ public class XmlToGolang {
         stringBuilder.append("\tvar ").append("result").append(" ").append(funcReturnType).append("\n");
         //create sql
         StringBuilder sql = new StringBuilder();
-        sql=decodeContent(contents,params);
+        sql.append("\tvar sql bytes.Buffer\n");
 
-        stringBuilder.append("\tvar db = context.GetInstance().Raw(").append(sql).append(").Scan(&result)\n");
+        sql.append(decodeContent(contents, params)).append("\n");
+
+        stringBuilder.append(sql).append("\tvar db = context.GetInstance().Raw(sql.String()).Scan(&result)\n");
         stringBuilder.append("\tif db.Error != nil {\n" +
                 "\t\treturn result, db.Error\n" +
                 "\t}\n" +
@@ -163,45 +191,40 @@ public class XmlToGolang {
         return stringBuilder.toString();
     }
 
-    private static StringBuilder decodeContent(List<Object> contents,Map<String, String> params) {
-        StringBuilder sql=new StringBuilder();
+    private static StringBuilder decodeContent(List<Object> contents, Map<String, String> params) {
+        StringBuilder sql = new StringBuilder();
         for (Object obj : contents) {
             if (obj.getClass().equals(DefaultText.class)) {
                 //text
                 DefaultText text = (DefaultText) obj;
-                String raw=text.getText().replaceAll("\n","").replaceAll("  "," ");
+                String raw = text.getText().replaceAll("\n", "").replaceAll("  ", "");
 
                 for (Map.Entry<String, String> entry : params.entrySet()) {
-                    String type = "string";
-                    String jdbcType = entry.getValue();
-                    if (!jdbcType.equals("")) {
-                        type = JDBC2Golang.getGolangValue(jdbcType);
-                    }
-                    raw=raw.replaceAll("\\#\\{"+entry.getKey()+"\\}","` + "+entry.getKey()+" + `");
-                    raw=raw.replaceAll("\\#\\{"+entry.getKey()+",jdbcType="+entry.getValue()+"\\}","` + "+entry.getKey()+" + `");
+                    raw = raw.replaceAll("&lt;","<");
+                    raw = raw.replaceAll("\\#\\{" + entry.getKey() + "\\}", "` + " + entry.getKey() + " + `");
+                    raw = raw.replaceAll("\\#\\{" + entry.getKey() + ",jdbcType=" + entry.getValue() + "\\}", "` + " + entry.getKey() + " + `");
                 }
-                sql.append("`").append(raw).append("` +");
+                if (StringUtil.isNotEmpty(raw)) sql.append("\tsql.WriteString(`").append(raw).append("`)\n");
             } else if (obj.getClass().equals(DefaultElement.class)) {
                 //if
                 DefaultElement element = (DefaultElement) obj;
                 String test = safeAttribute(element, "test");
                 String[] andTests = test.split(" and ");
                 if (andTests.length != 0) {
-                    int i=0;
+                    int i = 0;
                     for (String item : andTests) {
-                        sql.append("\n\tif ").append(item);
+                        if (i == 0) sql.append("\tif ");
+                        sql.append(item);
                         i++;
-                        if(i<andTests.length)sql.append(" && ");
+                        if (i < andTests.length) sql.append(" && ");
                     }
-                    sql.append("{").append(decodeContent(element.content(),params)).append("}");
+                    sql.append("\t{\n").append(decodeContent(element.content(), params)).append("\n\t}\n");
                 }
             }
         }
-        sql= com.zxj.plugin.util.StringUtil.deleteLastString(sql,"+");
+        sql = com.zxj.plugin.util.StringUtil.deleteLastString(sql, "+");
         return sql;
     }
-
-
 
 
     private static String safeAttribute(Element element, String key) {

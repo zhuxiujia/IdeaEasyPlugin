@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ActivityMapperImpl" model="go-p2p/platform-common/src/com/platform/common/dao/model">
+<mapper namespace="ActivityMapperImpl"
+        model="go-p2p/platform-common/src/com/platform/common/dao/model"
+        context="go-p2p/microservice/everything/src/main/com/platform/context">
     <resultMap id="BaseResultMap" type="model.Activity">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
@@ -38,28 +40,20 @@
 
     </select>
     <!--int countByCondition(@Param("name")String name,@Param("startTime") Date startTime, @Param("endTime")Date endTime);-->
-    <select id="countByCondition" resultType="java.lang.Integer">
+    <select id="countByCondition" resultType="int">
         select count(id) from biz_activity where delete_flag=1
-
-
         <if test="name != ``">
             and name like concat('%',#{name},'%')
         </if>
-
-
         <if test="startTime != ``">
             and create_time >= #{startTime}
         </if>
-
-
         <if test="endTime != ``">
             and create_time &lt;= #{endTime}
         </if>
-
-
     </select>
     <!--List<Activity> selectAll();-->
-    <select id="selectAll" resultMap="BaseResultMap">
+    <select id="selectAll" resultMap="BaseResultMap" collection="array">
         select * from biz_activity where delete_flag=1 order by create_time desc
     </select>
     <!--Activity selectByUUID(@Param("uuid")String uuid);-->
