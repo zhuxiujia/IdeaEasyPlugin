@@ -3,12 +3,11 @@ package com.zxj.plugin.util.lang.go;
 import java.util.List;
 
 public class ResultMap {
-     String id;
-     String type;
+    public String id;
+    public String type;
 
-     ResultItem idItem;
-     List<ResultItem> resultItems;
-
+    public ResultItem idItem;
+    public List<ResultItem> resultItems;
 
 
     public void setResultItems(List<ResultItem> resultItems) {
@@ -45,32 +44,4 @@ public class ResultMap {
 }
 
 
- class ResultItem{
-     private  String column;
-     private  String property;
-     private  String jdbcType;
 
-     public String getColumn() {
-         return column;
-     }
-
-     public void setColumn(String column) {
-         this.column = column;
-     }
-
-     public String getProperty() {
-         return property;
-     }
-
-     public void setProperty(String property) {
-         this.property = property;
-     }
-
-     public String getJdbcType() {
-         return jdbcType;
-     }
-
-     public void setJdbcType(String jdbcType) {
-         this.jdbcType = jdbcType;
-     }
- }
