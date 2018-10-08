@@ -196,7 +196,7 @@ public class XmlToGolang {
         StringBuilder sql = new StringBuilder();
         sql.append("\tvar sql bytes.Buffer\n");
 
-        sql.append(decodeContent(contents, params)).append("\n");
+        sql.append(decodeContent(contents, params));
 
         stringBuilder.append(sql).append("\tvar db = context.GetInstance().Raw(sql.String()).Scan(&result)\n");
         stringBuilder.append("\tif db.Error != nil {\n" +
@@ -245,7 +245,7 @@ public class XmlToGolang {
                         i++;
                         if (i < andTests.length) sql.append(" && ");
                     }
-                    sql.append("\t{\n").append(decodeContent(element, params)).append("\n\t}\n");
+                    sql.append("\t{\n").append(decodeContent(element, params)).append("\t}\n");
                 }
             }
 
