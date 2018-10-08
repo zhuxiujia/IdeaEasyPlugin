@@ -9,10 +9,7 @@ import org.dom4j.tree.DefaultElement;
 import org.dom4j.tree.DefaultText;
 
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,7 +106,7 @@ public class XmlToGolang {
                     returnType = map.getType();
                 }
             }
-            Map<String, String> params = new HashMap<>();
+            Map<String, String> params = new LinkedHashMap<>();
             scanAllParams(element, params);
             String func = createSelectFunc(id, basicXmlInfo.getNamespace(), params, returnType, collection, element);
             System.out.println(func);
