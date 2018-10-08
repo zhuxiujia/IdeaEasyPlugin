@@ -17,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class XmlToGolang {
-    static final String regEx = "#\\{([^\\}]+)\\}";
 
     public static void main(String[] args) throws Exception {
         String file = "D:\\JAVA\\IdeaEasyPlugin\\test\\ActivityMapper.xml";
@@ -83,6 +82,13 @@ public class XmlToGolang {
         return basicXmlInfo;
     }
 
+    /**
+     * 解码select函数
+     *
+     * @param rootElement
+     * @param basicXmlInfo
+     * @param resultMaps
+     */
     private static void decodeSelect(Element rootElement, BasicXmlInfo basicXmlInfo, Map<String, ResultMap> resultMaps) {
         List<Element> selects = rootElement.elements("select");
         for (Element element : selects) {
@@ -110,7 +116,14 @@ public class XmlToGolang {
         }
     }
 
+    /**
+     * xml中扫描参数和类型
+     *
+     * @param element
+     * @param params
+     */
     private static void scanAllParams(Element element, Map<String, String> params) {
+        String regEx = "#\\{([^\\}]+)\\}";
         Pattern pattern = Pattern.compile(regEx);
         loopGetElement(element, new LoopInterface() {
             @Override
@@ -137,19 +150,30 @@ public class XmlToGolang {
 
     }
 
+    /**
+     * 创建select函数
+     *
+     * @param id
+     * @param mapperName
+     * @param params
+     * @param returnType
+     * @param collection
+     * @param contents
+     * @return
+     */
     private static String createSelectFunc(String id, String mapperName, Map<String, String> params, String returnType, String collection, Element contents) {
         StringBuilder stringBuilder = new StringBuilder();
         //create func title
         stringBuilder.append("func (this ").append(mapperName).append(")").append(id).append("(");
         int i = 0;
         for (Map.Entry<String, String> entry : params.entrySet()) {
+            i++;
             String type = "string";
             String jdbcType = entry.getValue();
             if (!jdbcType.equals("")) {
                 type = JDBC2Golang.getGolangValue(jdbcType);
             }
             stringBuilder.append(entry.getKey()).append(" ").append(type);
-            i++;
             if (i != params.size()) {
                 stringBuilder.append(",");
             }
@@ -182,6 +206,13 @@ public class XmlToGolang {
         return stringBuilder.toString();
     }
 
+    /**
+     * 循环解码xml体
+     *
+     * @param element
+     * @param params
+     * @return
+     */
     private static StringBuilder decodeContent(Element element, Map<String, String> params) {
         final StringBuilder sql = new StringBuilder();
         loopGetElement(element, new LoopInterface() {
@@ -192,8 +223,10 @@ public class XmlToGolang {
 
                 for (Map.Entry<String, String> entry : params.entrySet()) {
                     raw = raw.replaceAll("&lt;", "<");
+                    if (StringUtil.isNotEmpty(entry.getValue())) {
+                        raw = raw.replaceAll("\\#\\{" + entry.getKey() + ",jdbcType=" + entry.getValue() + "\\}", "` + " + JDBC2Golang.getGolangConvertString(entry.getValue(), entry.getKey()) + " + `");
+                    }
                     raw = raw.replaceAll("\\#\\{" + entry.getKey() + "\\}", "` + " + entry.getKey() + " + `");
-                    raw = raw.replaceAll("\\#\\{" + entry.getKey() + ",jdbcType=" + entry.getValue() + "\\}", "` + " + entry.getKey() + " + `");
                 }
                 if (StringUtil.isNotEmpty(raw)) sql.append("\tsql.WriteString(`").append(raw).append("`)\n");
             }
@@ -207,6 +240,7 @@ public class XmlToGolang {
                     int i = 0;
                     for (String item : andTests) {
                         if (i == 0) sql.append("\tif ");
+                        item = decodeItemType(item, params);
                         sql.append(item);
                         i++;
                         if (i < andTests.length) sql.append(" && ");
@@ -214,11 +248,33 @@ public class XmlToGolang {
                     sql.append("\t{\n").append(decodeContent(element, params)).append("\n\t}\n");
                 }
             }
+
+            private String decodeItemType(String item, Map<String, String> params) {
+                item = item.replaceAll("\t", "").replaceAll("\n", "").replaceAll("  ", "");
+                item = item.replaceAll("&lt;", "<");
+                String[] keys = item.split(" ");
+                for (String key : keys) {
+                    for (Map.Entry<String, String> entry : params.entrySet()) {
+                        if (key.equals(entry.getKey())) {
+                            return JDBC2Golang.getGolangIsNull(entry.getValue(), key);
+                        }
+                    }
+                    return item;
+                }
+                return item;
+            }
         });
         return sql;
     }
 
 
+    /**
+     * 安全的取值
+     *
+     * @param element
+     * @param key
+     * @return
+     */
     private static String safeAttribute(Element element, String key) {
         Attribute a = element.attribute(key);
         if (a == null) {
@@ -227,6 +283,12 @@ public class XmlToGolang {
         return a.getValue();
     }
 
+    /**
+     * 循环工具
+     *
+     * @param element
+     * @param loopInterface
+     */
     private static void loopGetElement(Element element, LoopInterface loopInterface) {
         for (Object obj : element.content()) {
             if (obj.getClass().equals(DefaultText.class)) {

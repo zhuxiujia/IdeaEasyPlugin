@@ -1,5 +1,7 @@
 package com.zxj.plugin.util.lang.go;
 
+import com.intellij.openapi.util.text.StringUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,5 +58,58 @@ public class JDBC2Golang {
         String va = JDBCs.get(jdbcTYPE);
         if (va != null) va = va.substring(va.lastIndexOf(".") + 1, va.length());
         return va;
+    }
+
+    public static String getGolangConvertString(String jdbcTYPE, String keyName) {
+        if (jdbcTYPE != null && jdbcTYPE.equals("") == false) {
+            if (jdbcTYPE.equalsIgnoreCase("CHAR") ||
+                    jdbcTYPE.equalsIgnoreCase("CLOB") ||
+                    jdbcTYPE.equalsIgnoreCase("LONGVARCHAR") ||
+                    jdbcTYPE.equalsIgnoreCase("VARCHAR")) {
+                return keyName;
+            } else if (jdbcTYPE.equals("TIMESTAMP") ||
+                    jdbcTYPE.equals("TIME")) {
+                return keyName + ".Format(`2006-01-02 15:04:05`)";
+            } else if (jdbcTYPE.equals("BIGINT")) {
+                return "strconv.FormatInt(" + keyName + ", 10)";
+            } else if (jdbcTYPE.equals("INTEGER") ||
+                    jdbcTYPE.equals("SMALLINT")) {
+                return "strconv.Itoa(" + keyName + ")";
+            }else if (jdbcTYPE.equals("DOUBLE") ||
+                    jdbcTYPE.equals("FLOAT")||
+                    jdbcTYPE.equals("REAL")) {
+                return "strconv.FormatFloat("+keyName+", 'f', 8, 64)";
+            }else {
+                return keyName;
+            }
+        }else {
+            return keyName;
+        }
+    }
+    public static String getGolangIsNull(String jdbcTYPE, String keyName) {
+        if (jdbcTYPE != null && jdbcTYPE.equals("") == false) {
+            if (jdbcTYPE.equalsIgnoreCase("CHAR") ||
+                    jdbcTYPE.equalsIgnoreCase("CLOB") ||
+                    jdbcTYPE.equalsIgnoreCase("LONGVARCHAR") ||
+                    jdbcTYPE.equalsIgnoreCase("VARCHAR")) {
+                return keyName+" == ``";
+            } else if (jdbcTYPE.equals("TIMESTAMP") ||
+                    jdbcTYPE.equals("TIME")) {
+                return keyName + ".IsZero()";
+            } else if (jdbcTYPE.equals("BIGINT")) {
+                return  keyName + " == 0";
+            } else if (jdbcTYPE.equals("INTEGER") ||
+                    jdbcTYPE.equals("SMALLINT")) {
+                return  keyName + " == 0";
+            }else if (jdbcTYPE.equals("DOUBLE") ||
+                    jdbcTYPE.equals("FLOAT")||
+                    jdbcTYPE.equals("REAL")) {
+                return keyName+" == 0";
+            }else {
+                return keyName+" == ``";
+            }
+        }else {
+            return keyName+" == ``";
+        }
     }
 }

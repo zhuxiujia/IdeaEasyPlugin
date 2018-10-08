@@ -26,16 +26,16 @@
 
 
         <if test="startTime != ``">
-            and create_time >= #{startTime}
+            and create_time >= #{startTime,jdbcType=TIMESTAMP}
         </if>
 
 
         <if test="endTime != ``">
-            and create_time &lt;= #{endTime}
+            and create_time &lt;= #{endTime,jdbcType=TIMESTAMP}
         </if>
         order by create_time desc
 
-        <if test="page != `` and size != ``">limit #{page}, #{size}</if>
+        <if test="page != `` and size != ``">limit #{page,jdbcType=INTEGER}, #{size,jdbcType=INTEGER}</if>
 
 
     </select>
