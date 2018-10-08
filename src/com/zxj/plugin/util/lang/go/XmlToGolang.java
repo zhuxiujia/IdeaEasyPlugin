@@ -224,7 +224,7 @@ public class XmlToGolang {
                 for (Map.Entry<String, String> entry : params.entrySet()) {
                     raw = raw.replaceAll("&lt;", "<");
                     if (StringUtil.isNotEmpty(entry.getValue())) {
-                        raw = raw.replaceAll("\\#\\{" + entry.getKey() + ",jdbcType=" + entry.getValue() + "\\}", "` + " + JDBC2Golang.getGolangConvertString(entry.getValue(), entry.getKey()) + " + `");
+                        raw = raw.replaceAll("\\#\\{" + entry.getKey() + ",jdbcType=" + entry.getValue() + "\\}", "` + " + JDBC2Golang.convertString(entry.getValue(), entry.getKey()) + " + `");
                     }
                     raw = raw.replaceAll("\\#\\{" + entry.getKey() + "\\}", "` + " + entry.getKey() + " + `");
                 }
@@ -256,7 +256,7 @@ public class XmlToGolang {
                 for (String key : keys) {
                     for (Map.Entry<String, String> entry : params.entrySet()) {
                         if (key.equals(entry.getKey())) {
-                            return JDBC2Golang.getGolangIsNull(entry.getValue(), key);
+                            return JDBC2Golang.convertIsNullString(entry.getValue(), key);
                         }
                     }
                     return item;

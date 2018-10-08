@@ -60,7 +60,7 @@ public class JDBC2Golang {
         return va;
     }
 
-    public static String getGolangConvertString(String jdbcTYPE, String keyName) {
+    public static String convertString(String jdbcTYPE, String keyName) {
         if (jdbcTYPE != null && jdbcTYPE.equals("") == false) {
             if (jdbcTYPE.equalsIgnoreCase("CHAR") ||
                     jdbcTYPE.equalsIgnoreCase("CLOB") ||
@@ -86,7 +86,7 @@ public class JDBC2Golang {
             return keyName;
         }
     }
-    public static String getGolangIsNull(String jdbcTYPE, String keyName) {
+    public static String convertIsNullString(String jdbcTYPE, String keyName) {
         if (jdbcTYPE != null && jdbcTYPE.equals("") == false) {
             if (jdbcTYPE.equalsIgnoreCase("CHAR") ||
                     jdbcTYPE.equalsIgnoreCase("CLOB") ||
